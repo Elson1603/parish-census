@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.census import Family, Member
 from app.schemas import census as schemas
+from app.services.mobile_uniqueness import assert_mobile_available
 from app.services.queries import member_select
 
 router = APIRouter(prefix="/members", tags=["members"])
@@ -70,6 +71,8 @@ async def create_member(payload: schemas.MemberCreate, db: AsyncSession = Depend
     if not family:
         raise HTTPException(status_code=404, detail="Family not found")
 
+    await assert_mobile_available(db, payload.mobile)
+
     member = Member(
         family_id=payload.family_id,
         full_name=payload.full_name,
@@ -107,6 +110,8 @@ async def update_member(member_id: str, payload: schemas.MemberCreate, db: Async
     family = await db.get(Family, payload.family_id)
     if not family:
         raise HTTPException(status_code=404, detail="Family not found")
+
+    await assert_mobile_available(db, payload.mobile, exclude_member_id=member_id)
 
     member.family_id = payload.family_id
     member.full_name = payload.full_name

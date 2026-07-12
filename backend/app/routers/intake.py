@@ -1,11 +1,12 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.census import Family, Member
 from app.schemas import census as schemas
+from app.services.mobile_uniqueness import assert_mobile_available
 from app.services.village_lookup import get_or_create_village
 
 router = APIRouter(tags=["intake"])
@@ -13,6 +14,14 @@ router = APIRouter(tags=["intake"])
 
 @router.post("/census/intake")
 async def submit_family_census(payload: schemas.CensusFamilyIntake, db: AsyncSession = Depends(get_db)):
+    submitted_phones = [m.phone for m in payload.members if m.phone]
+    if len(submitted_phones) != len(set(submitted_phones)):
+        raise HTTPException(
+            status_code=409, detail="Two members in this family have the same phone number"
+        )
+    for phone in submitted_phones:
+        await assert_mobile_available(db, phone)
+
     village = await get_or_create_village(db, payload.village)
 
     head = payload.members[0]

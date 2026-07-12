@@ -10,6 +10,7 @@ import {
   type OptionWithOther,
 } from "@/types/census-intake";
 import { submitFamilyCensus } from "@/services/census.service";
+import { getApiErrorMessage } from "@/lib/api-error";
 import { VillageSelectStep } from "@/components/census/village-select-step";
 import { MemberForm } from "@/components/census/member-form";
 import { MemberSummaryList } from "@/components/census/member-summary-list";
@@ -72,21 +73,29 @@ function CensusIntakePage() {
   };
 
   const finishFamily = async (currentFamilyValue: CensusFamilyInput) => {
-    await submitFamilyCensus(buildFamilyPayload(currentFamilyValue));
+    try {
+      await submitFamilyCensus(buildFamilyPayload(currentFamilyValue));
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to save this family. Please try again."));
+      return false;
+    }
     setFamiliesRecorded((count) => count + 1);
     toast.success("Family record saved");
+    return true;
   };
 
   const handleAddAnotherFamily = async () => {
     if (!currentFamily) return;
     const finished = currentFamily;
-    await finishFamily(finished);
+    const saved = await finishFamily(finished);
+    if (!saved) return;
     startNewFamily(finished.village);
   };
 
   const handleChangeVillage = async () => {
     if (currentFamily && currentFamily.members.length > 0) {
-      await finishFamily(currentFamily);
+      const saved = await finishFamily(currentFamily);
+      if (!saved) return;
     }
     setCurrentFamily(null);
     setIsAddingMember(false);

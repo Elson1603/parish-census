@@ -15,6 +15,7 @@ import {
   getVillages,
   saveMemberDraft,
 } from "@/services/census.service";
+import { getApiErrorMessage } from "@/lib/api-error";
 import { memberFormSchema, type MemberFormValues } from "@/types/forms";
 import { calculateAge, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
@@ -136,7 +137,12 @@ function AddMemberPage() {
   if (hasError) return <ErrorState title="Unable to load form data" description="Please retry." />;
 
   const onSubmit = async (values: MemberFormValues) => {
-    await createMember(values);
+    try {
+      await createMember(values);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to save member. Please try again."));
+      return;
+    }
     toast.success("Member saved successfully");
     form.reset();
   };

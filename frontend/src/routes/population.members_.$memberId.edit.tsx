@@ -14,6 +14,7 @@ import {
   getVillages,
   updateMember,
 } from "@/services/census.service";
+import { getApiErrorMessage } from "@/lib/api-error";
 import { memberFormSchema, type MemberFormValues } from "@/types/forms";
 import { calculateAge, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
@@ -176,7 +177,12 @@ function EditMemberPage() {
     );
 
   const onSubmit = async (values: MemberFormValues) => {
-    await updateMember(memberId, values);
+    try {
+      await updateMember(memberId, values);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Unable to update member. Please try again."));
+      return;
+    }
     toast.success("Member updated successfully");
     navigate({ to: "/population/members" });
   };
