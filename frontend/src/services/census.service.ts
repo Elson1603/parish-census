@@ -2,8 +2,9 @@ import type {
   DashboardData,
   Family,
   Member,
-  ReportFilter,
-  ReportResultRow,
+  ReportDefinition,
+  ReportData,
+  ReportExportFormat,
   Village,
 } from "@/types/domain";
 import { apiClient } from "@/services/http";
@@ -14,7 +15,8 @@ export const censusQueryKeys = {
   families: ["families"] as const,
   familyById: (familyId: string) => ["family", familyId] as const,
   members: ["members"] as const,
-  reports: (reportType: string, filter: ReportFilter) => ["reports", reportType, filter] as const,
+  reports: ["reports"] as const,
+  reportData: (reportType: string) => ["reports", reportType] as const,
 };
 
 export interface MemberFilters {
@@ -75,11 +77,23 @@ export async function getMemberById(memberId: string) {
   return response.data;
 }
 
-export async function getReports(reportType: string, filter: ReportFilter) {
-  const response = await apiClient.get<ReportResultRow[]>(`/reports/${reportType}`, {
-    params: toParams(filter),
-  });
+export async function getReportsList() {
+  const response = await apiClient.get<ReportDefinition[]>("/reports");
   return response.data;
+}
+
+export async function getReportData(reportType: string) {
+  const response = await apiClient.get<ReportData>(`/reports/${reportType}`);
+  return response.data;
+}
+
+export function getReportExportUrl(
+  reportType: string,
+  format: ReportExportFormat,
+  mode: "inline" | "attachment" = "attachment",
+) {
+  const base = (apiClient.defaults.baseURL ?? "/api").replace(/\/$/, "");
+  return `${base}/reports/${reportType}/export?format=${format}&mode=${mode}`;
 }
 
 export async function getGlobalSearchSuggestions(query: string) {

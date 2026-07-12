@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportsReportTypeRouteImport } from './routes/reports_.$reportType'
 import { Route as PopulationVillagesRouteImport } from './routes/population.villages'
 import { Route as PopulationMembersRouteImport } from './routes/population.members'
 import { Route as PopulationFamiliesRouteImport } from './routes/population.families'
@@ -20,6 +22,11 @@ import { Route as PopulationFamiliesAddRouteImport } from './routes/population.f
 import { Route as PopulationFamiliesFamilyIdRouteImport } from './routes/population.families_.$familyId'
 import { Route as PopulationMembersMemberIdEditRouteImport } from './routes/population.members_.$memberId.edit'
 
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -28,6 +35,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsReportTypeRoute = ReportsReportTypeRouteImport.update({
+  id: '/reports_/$reportType',
+  path: '/reports/$reportType',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PopulationVillagesRoute = PopulationVillagesRouteImport.update({
@@ -77,9 +89,11 @@ const PopulationMembersMemberIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/reports': typeof ReportsRoute
   '/population/families': typeof PopulationFamiliesRoute
   '/population/members': typeof PopulationMembersRoute
   '/population/villages': typeof PopulationVillagesRoute
+  '/reports/$reportType': typeof ReportsReportTypeRoute
   '/population/families/$familyId': typeof PopulationFamiliesFamilyIdRoute
   '/population/families/add': typeof PopulationFamiliesAddRoute
   '/population/members/add': typeof PopulationMembersAddRoute
@@ -89,9 +103,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/reports': typeof ReportsRoute
   '/population/families': typeof PopulationFamiliesRoute
   '/population/members': typeof PopulationMembersRoute
   '/population/villages': typeof PopulationVillagesRoute
+  '/reports/$reportType': typeof ReportsReportTypeRoute
   '/population/families/$familyId': typeof PopulationFamiliesFamilyIdRoute
   '/population/families/add': typeof PopulationFamiliesAddRoute
   '/population/members/add': typeof PopulationMembersAddRoute
@@ -102,9 +118,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/reports': typeof ReportsRoute
   '/population/families': typeof PopulationFamiliesRoute
   '/population/members': typeof PopulationMembersRoute
   '/population/villages': typeof PopulationVillagesRoute
+  '/reports_/$reportType': typeof ReportsReportTypeRoute
   '/population/families_/$familyId': typeof PopulationFamiliesFamilyIdRoute
   '/population/families_/add': typeof PopulationFamiliesAddRoute
   '/population/members_/add': typeof PopulationMembersAddRoute
@@ -116,9 +134,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/reports'
     | '/population/families'
     | '/population/members'
     | '/population/villages'
+    | '/reports/$reportType'
     | '/population/families/$familyId'
     | '/population/families/add'
     | '/population/members/add'
@@ -128,9 +148,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/reports'
     | '/population/families'
     | '/population/members'
     | '/population/villages'
+    | '/reports/$reportType'
     | '/population/families/$familyId'
     | '/population/families/add'
     | '/population/members/add'
@@ -140,9 +162,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/reports'
     | '/population/families'
     | '/population/members'
     | '/population/villages'
+    | '/reports_/$reportType'
     | '/population/families_/$familyId'
     | '/population/families_/add'
     | '/population/members_/add'
@@ -153,9 +177,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  ReportsRoute: typeof ReportsRoute
   PopulationFamiliesRoute: typeof PopulationFamiliesRoute
   PopulationMembersRoute: typeof PopulationMembersRoute
   PopulationVillagesRoute: typeof PopulationVillagesRoute
+  ReportsReportTypeRoute: typeof ReportsReportTypeRoute
   PopulationFamiliesFamilyIdRoute: typeof PopulationFamiliesFamilyIdRoute
   PopulationFamiliesAddRoute: typeof PopulationFamiliesAddRoute
   PopulationMembersAddRoute: typeof PopulationMembersAddRoute
@@ -165,6 +191,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -177,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports_/$reportType': {
+      id: '/reports_/$reportType'
+      path: '/reports/$reportType'
+      fullPath: '/reports/$reportType'
+      preLoaderRoute: typeof ReportsReportTypeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/population/villages': {
@@ -241,9 +281,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  ReportsRoute: ReportsRoute,
   PopulationFamiliesRoute: PopulationFamiliesRoute,
   PopulationMembersRoute: PopulationMembersRoute,
   PopulationVillagesRoute: PopulationVillagesRoute,
+  ReportsReportTypeRoute: ReportsReportTypeRoute,
   PopulationFamiliesFamilyIdRoute: PopulationFamiliesFamilyIdRoute,
   PopulationFamiliesAddRoute: PopulationFamiliesAddRoute,
   PopulationMembersAddRoute: PopulationMembersAddRoute,

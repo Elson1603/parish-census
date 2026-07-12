@@ -90,33 +90,31 @@ export interface DashboardData {
   timeline: ActivityItem[];
 }
 
-export interface ReportFilter {
-  village?: string;
-  occupation?: string;
-  education?: string;
-  fromDate?: string;
-  toDate?: string;
+export interface ReportDefinition {
+  reportType: string;
+  title: string;
+  description: string;
 }
 
-export interface ReportResultRow {
-  id: string;
-  label: string;
-  village: string;
-  families: number;
-  members: number;
-  male: number;
-  female: number;
+export interface ReportTable {
+  headers: string[];
+  rows: string[][];
 }
 
-export type ReportType =
-  | "village-population"
-  | "family"
-  | "member"
-  | "occupation"
-  | "education"
-  | "blood-group"
-  | "age"
-  | "gender"
-  | "church-group"
-  | "sacraments"
-  | "special-needs";
+export interface ReportChart {
+  title: string;
+  kind: "bar" | "pie";
+  labels: string[];
+  values: number[];
+}
+
+export interface ReportData {
+  reportType: string;
+  title: string;
+  description: string;
+  summary: ReportTable | null;
+  detail: ReportTable;
+  charts: ReportChart[];
+}
+
+export type ReportExportFormat = "pdf" | "excel" | "csv";

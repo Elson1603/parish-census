@@ -199,26 +199,35 @@ class DashboardData(BaseModel):
     timeline: list[ActivityItem]
 
 
-class ReportFilter(BaseModel):
-    village: str | None = None
-    occupation: str | None = None
-    education: str | None = None
-    from_date: date | None = Field(default=None, alias="fromDate")
-    to_date: date | None = Field(default=None, alias="toDate")
-
+class ReportDefinition(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
+    report_type: str = Field(serialization_alias="reportType")
+    title: str
+    description: str
 
-class ReportResultRow(BaseModel):
+
+class ReportTable(BaseModel):
+    headers: list[str]
+    rows: list[list[str]]
+
+
+class ReportChart(BaseModel):
+    title: str
+    kind: str
+    labels: list[str]
+    values: list[float]
+
+
+class ReportDataOut(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    id: str
-    label: str
-    village: str
-    families: int
-    members: int
-    male: int
-    female: int
+    report_type: str = Field(serialization_alias="reportType")
+    title: str
+    description: str
+    summary: ReportTable | None = None
+    detail: ReportTable
+    charts: list[ReportChart] = []
 
 
 class SearchResult(BaseModel):

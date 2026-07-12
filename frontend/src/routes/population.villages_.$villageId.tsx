@@ -7,10 +7,24 @@ import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { getFamilies, getMembers, getVillages } from "@/services/census.service";
 import { calculateAge } from "@/utils/date";
+import type { Member } from "@/types/domain";
 
 export const Route = createFileRoute("/population/villages_/$villageId")({
   component: VillageDetailPage,
 });
+
+// Counts non-blank values for a field, sorted most-common first - used for the
+// Education/Job/Church Group breakdowns, which are open-ended (unlike Gender
+// or Marital Status) so we can't rely on a fixed set of buckets.
+function countByField(members: Member[], key: "education" | "occupation" | "churchGroup") {
+  const counts: Record<string, number> = {};
+  for (const member of members) {
+    const value = member[key];
+    if (!value) continue;
+    counts[value] = (counts[value] ?? 0) + 1;
+  }
+  return Object.entries(counts).sort(([, a], [, b]) => b - a);
+}
 
 function VillageDetailPage() {
   const { villageId } = Route.useParams();
@@ -25,7 +39,7 @@ function VillageDetailPage() {
   });
 
   const families = familiesQuery.data ?? [];
-  const members = membersQuery.data ?? [];
+  const members = useMemo(() => membersQuery.data ?? [], [membersQuery.data]);
 
   const ageGroups = useMemo(() => {
     const buckets = { children: 0, youth: 0, adults: 0, seniors: 0 };
@@ -47,6 +61,10 @@ function VillageDetailPage() {
     }
     return counts;
   }, [members]);
+
+  const educationCounts = useMemo(() => countByField(members, "education"), [members]);
+  const occupationCounts = useMemo(() => countByField(members, "occupation"), [members]);
+  const churchGroupCounts = useMemo(() => countByField(members, "churchGroup"), [members]);
 
   if (villagesQuery.isLoading || familiesQuery.isLoading || membersQuery.isLoading)
     return <LoadingSpinner label="Loading village details..." />;
@@ -152,6 +170,59 @@ function VillageDetailPage() {
                 </li>
               ))}
             </ul>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card className="panel-surface">
+          <CardHeader>
+            <CardTitle>Education Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {educationCounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No education data recorded yet.</p>
+            ) : (
+              educationCounts.map(([label, count]) => (
+                <Badge key={label} variant="outline">
+                  {label}: {count}
+                </Badge>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="panel-surface">
+          <CardHeader>
+            <CardTitle>Job Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {occupationCounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No job data recorded yet.</p>
+            ) : (
+              occupationCounts.map(([label, count]) => (
+                <Badge key={label} variant="outline">
+                  {label}: {count}
+                </Badge>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="panel-surface">
+          <CardHeader>
+            <CardTitle>Church Group Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {churchGroupCounts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No church group data recorded yet.</p>
+            ) : (
+              churchGroupCounts.map(([label, count]) => (
+                <Badge key={label} variant="outline">
+                  {label}: {count}
+                </Badge>
+              ))
+            )}
           </CardContent>
         </Card>
       </section>
