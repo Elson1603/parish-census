@@ -40,7 +40,6 @@ function AddFamilyPage() {
     resolver: zodResolver(familyFormSchema),
     defaultValues: {
       villageId: "",
-      houseNumber: "",
       headOfFamily: "",
       primaryMobile: "",
       alternateMobile: "",
@@ -71,7 +70,6 @@ function AddFamilyPage() {
   const onSubmit = async (values: FamilyFormValues) => {
     await createFamily({
       villageId: values.villageId,
-      houseNumber: values.houseNumber,
       headOfFamily: values.headOfFamily,
       contactNumber: values.primaryMobile,
       alternateNumber: values.alternateMobile,
@@ -120,20 +118,6 @@ function AddFamilyPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="houseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>House Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="H-12" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

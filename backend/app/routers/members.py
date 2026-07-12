@@ -32,7 +32,6 @@ async def list_members(
             or_(
                 func.lower(Member.full_name).like(pattern),
                 Member.mobile.like(f"%{search.strip()}%"),
-                func.lower(Family.house_number).like(pattern),
             )
         )
     if village and village != "all":

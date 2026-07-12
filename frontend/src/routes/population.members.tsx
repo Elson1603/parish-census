@@ -102,7 +102,6 @@ function MembersPage() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Village</TableHead>
-                <TableHead>House No.</TableHead>
                 <TableHead>Gender</TableHead>
                 <TableHead>Age</TableHead>
                 <TableHead>Mobile</TableHead>
@@ -115,7 +114,6 @@ function MembersPage() {
                 <TableRow key={member.id}>
                   <TableCell>{member.fullName}</TableCell>
                   <TableCell>{member.villageName}</TableCell>
-                  <TableCell>{member.houseNumber}</TableCell>
                   <TableCell>{member.gender}</TableCell>
                   <TableCell>{member.age}</TableCell>
                   <TableCell>{member.mobile}</TableCell>

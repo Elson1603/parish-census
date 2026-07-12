@@ -14,7 +14,6 @@ router = APIRouter(prefix="/families", tags=["families"])
 async def list_families(
     search: str | None = Query(default=None),
     village: str | None = Query(default=None),
-    houseNumber: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
     stmt = family_select()
@@ -24,14 +23,11 @@ async def list_families(
         stmt = stmt.where(
             or_(
                 func.lower(Family.head_of_family).like(pattern),
-                func.lower(Family.house_number).like(pattern),
                 func.lower(Village.name).like(pattern),
             )
         )
     if village and village != "all":
         stmt = stmt.where(Family.village_id == village)
-    if houseNumber:
-        stmt = stmt.where(func.lower(Family.house_number).like(f"%{houseNumber.strip().lower()}%"))
 
     stmt = stmt.order_by(Family.created_at.desc())
     rows = (await db.execute(stmt)).all()
@@ -60,7 +56,6 @@ async def create_family(payload: schemas.FamilyCreate, db: AsyncSession = Depend
 
     family = Family(
         village_id=payload.village_id,
-        house_number=payload.house_number,
         head_of_family=payload.head_of_family,
         contact_number=payload.contact_number,
         alternate_number=payload.alternate_number,

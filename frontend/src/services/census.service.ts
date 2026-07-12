@@ -34,7 +34,6 @@ export interface MemberFilters {
 export interface FamilyFilters {
   search?: string;
   village?: string;
-  houseNumber?: string;
 }
 
 function toParams<T extends object>(filters?: T) {

@@ -11,7 +11,6 @@ export interface Family {
   id: string;
   villageId: string;
   villageName: string;
-  houseNumber: string;
   headOfFamily: string;
   contactNumber: string;
   alternateNumber?: string;
@@ -26,7 +25,6 @@ export interface Member {
   familyId: string;
   villageId: string;
   villageName: string;
-  houseNumber: string;
   fullName: string;
   gender: Gender;
   dob: string;

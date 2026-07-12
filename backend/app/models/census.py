@@ -26,9 +26,8 @@ class Family(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     village_id: Mapped[str] = mapped_column(ForeignKey("villages.id", ondelete="CASCADE"), nullable=False)
-    # house_number/contact_number/address default to "" because the quick door-to-door
-    # census intake flow doesn't collect them yet; the admin "Add Family" form fills them in.
-    house_number: Mapped[str] = mapped_column(String(50), nullable=False, default="")
+    # contact_number/address default to "" because the quick door-to-door census intake
+    # flow doesn't collect them yet; the admin "Add Family" form fills them in.
     head_of_family: Mapped[str] = mapped_column(String(200), nullable=False)
     contact_number: Mapped[str] = mapped_column(String(20), nullable=False, default="")
     alternate_number: Mapped[str | None] = mapped_column(String(20), nullable=True)

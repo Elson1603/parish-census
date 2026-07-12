@@ -165,7 +165,6 @@ async def _family_report(db: AsyncSession, title: str, description: str) -> Repo
         detail=ReportTable(
             headers=[
                 "Head of Family",
-                "House No.",
                 "Village",
                 "Contact",
                 "Alternate",
@@ -176,7 +175,6 @@ async def _family_report(db: AsyncSession, title: str, description: str) -> Repo
             rows=[
                 [
                     _row_get(row, "head_of_family"),
-                    _row_get(row, "house_number"),
                     _row_get(row, "village_name"),
                     _row_get(row, "contact_number"),
                     _row_get(row, "alternate_number") or "",
@@ -200,7 +198,6 @@ async def _member_report(db: AsyncSession, title: str, description: str) -> Repo
             headers=[
                 "Name",
                 "Village",
-                "House No.",
                 "Gender",
                 "Age",
                 "Mobile",
@@ -214,7 +211,6 @@ async def _member_report(db: AsyncSession, title: str, description: str) -> Repo
                 [
                     _row_get(row, "full_name"),
                     _row_get(row, "village_name"),
-                    _row_get(row, "house_number"),
                     _row_get(row, "gender") or "",
                     str(_row_get(row, "age")),
                     _row_get(row, "mobile") or "",
@@ -422,7 +418,6 @@ async def _special_remark_report(db: AsyncSession, title: str, description: str)
         [
             _row_get(row, "full_name"),
             _row_get(row, "village_name"),
-            _row_get(row, "house_number"),
             _row_get(row, "remarks") or "",
         ]
         for row in rows
@@ -433,7 +428,7 @@ async def _special_remark_report(db: AsyncSession, title: str, description: str)
         report_type="special-remark",
         title=title,
         description=description,
-        detail=ReportTable(headers=["Name", "Village", "House No.", "Remark"], rows=detail_rows),
+        detail=ReportTable(headers=["Name", "Village", "Remark"], rows=detail_rows),
     )
 
 

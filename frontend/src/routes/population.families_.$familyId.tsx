@@ -46,9 +46,6 @@ function FamilyDetailPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="rounded-md border border-border bg-background/70 p-3 text-sm">
-              House No: {family.houseNumber}
-            </div>
-            <div className="rounded-md border border-border bg-background/70 p-3 text-sm">
               Village: {family.villageName}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3 text-sm">

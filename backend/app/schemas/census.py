@@ -33,7 +33,6 @@ class Village(VillageBase):
 
 class FamilyBase(BaseModel):
     village_id: str = Field(alias="villageId")
-    house_number: str = Field(alias="houseNumber", min_length=1, max_length=50)
     head_of_family: str = Field(alias="headOfFamily", min_length=2, max_length=200)
     contact_number: str = Field(alias="contactNumber", min_length=1, max_length=20)
     alternate_number: str | None = Field(default=None, alias="alternateNumber", max_length=20)
@@ -66,7 +65,6 @@ class Family(BaseModel):
     id: str
     village_id: str = Field(serialization_alias="villageId")
     village_name: str = Field(serialization_alias="villageName")
-    house_number: str = Field(serialization_alias="houseNumber")
     head_of_family: str = Field(serialization_alias="headOfFamily")
     contact_number: str = Field(serialization_alias="contactNumber")
     alternate_number: str | None = Field(default=None, serialization_alias="alternateNumber")
@@ -126,7 +124,6 @@ class Member(BaseModel):
     family_id: str = Field(serialization_alias="familyId")
     village_id: str = Field(serialization_alias="villageId")
     village_name: str = Field(serialization_alias="villageName")
-    house_number: str = Field(serialization_alias="houseNumber")
     full_name: str = Field(serialization_alias="fullName")
     # Loosened from the Gender literal: quick census-intake rows may not have gender set yet.
     gender: str

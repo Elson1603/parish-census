@@ -346,7 +346,6 @@ function DashboardPage() {
                       >
                         {family.headOfFamily}
                       </Link>
-                      <p className="text-xs text-muted-foreground">{family.houseNumber}</p>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{family.villageName}</TableCell>
                     <TableCell className="text-right text-xs text-muted-foreground">

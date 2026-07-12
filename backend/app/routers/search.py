@@ -39,12 +39,11 @@ async def global_search(q: str = Query(default=""), db: AsyncSession = Depends(g
 
     family_rows = (
         await db.execute(
-            select(Family.id, Family.head_of_family, Family.house_number, Village.name)
+            select(Family.id, Family.head_of_family, Village.name)
             .join(Village, Village.id == Family.village_id)
             .where(
                 or_(
                     func.lower(Family.head_of_family).like(pattern),
-                    func.lower(Family.house_number).like(pattern),
                     func.lower(Village.name).like(pattern),
                 )
             )
@@ -52,8 +51,8 @@ async def global_search(q: str = Query(default=""), db: AsyncSession = Depends(g
         )
     ).all()
     family_matches = [
-        schemas.SearchResult(id=id_, type="Family", label=f"{head} ({house})", meta=village)
-        for id_, head, house, village in family_rows
+        schemas.SearchResult(id=id_, type="Family", label=head, meta=village)
+        for id_, head, village in family_rows
     ]
 
     village_count_subquery = (

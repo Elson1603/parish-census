@@ -34,15 +34,12 @@ export const Route = createFileRoute("/population/families")({
 function FamiliesPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
-  const [houseNumber, setHouseNumber] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
-  const debouncedHouseNumber = useDebouncedValue(houseNumber, 300);
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
   const familiesQuery = useQuery({
-    queryKey: ["families", { search: debouncedSearch, village, houseNumber: debouncedHouseNumber }],
-    queryFn: () =>
-      getFamilies({ search: debouncedSearch, village, houseNumber: debouncedHouseNumber }),
+    queryKey: ["families", { search: debouncedSearch, village }],
+    queryFn: () => getFamilies({ search: debouncedSearch, village }),
     placeholderData: keepPreviousData,
   });
 
@@ -69,7 +66,7 @@ function FamiliesPage() {
         }
       />
 
-      <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -89,12 +86,6 @@ function FamiliesPage() {
             ))}
           </SelectContent>
         </Select>
-
-        <Input
-          value={houseNumber}
-          onChange={(event) => setHouseNumber(event.target.value)}
-          placeholder="House number"
-        />
       </section>
 
       {rows.length === 0 ? (
@@ -110,7 +101,6 @@ function FamiliesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Head of Family</TableHead>
-                <TableHead>House No.</TableHead>
                 <TableHead>Village</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead className="text-right">Action</TableHead>
@@ -120,7 +110,6 @@ function FamiliesPage() {
               {rows.map((family) => (
                 <TableRow key={family.id}>
                   <TableCell>{family.headOfFamily}</TableCell>
-                  <TableCell>{family.houseNumber}</TableCell>
                   <TableCell>{family.villageName}</TableCell>
                   <TableCell>{family.contactNumber}</TableCell>
                   <TableCell className="text-right">

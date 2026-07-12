@@ -17,7 +17,7 @@ import {
   OTHER_VALUE,
 } from "@/constants/census-form-options";
 import { resolveOptionLabel, type OptionWithOther } from "@/types/census-intake";
-import { memberEditFormSchema, type MemberEditFormValues } from "@/types/forms";
+import { memberFormSchema, type MemberFormValues } from "@/types/forms";
 import { calculateAge, parseIsoDate, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { SelectWithOther } from "@/components/census/select-with-other";
@@ -67,8 +67,8 @@ function EditMemberPage() {
     queryFn: () => getMemberById(memberId),
   });
 
-  const form = useForm<MemberEditFormValues>({
-    resolver: zodResolver(memberEditFormSchema),
+  const form = useForm<MemberFormValues>({
+    resolver: zodResolver(memberFormSchema),
     defaultValues: {
       fullName: "",
       gender: "",
@@ -134,7 +134,7 @@ function EditMemberPage() {
       />
     );
 
-  const onSubmit = async (values: MemberEditFormValues) => {
+  const onSubmit = async (values: MemberFormValues) => {
     try {
       await updateMember(memberId, values);
     } catch (error) {

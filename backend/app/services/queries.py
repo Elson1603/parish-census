@@ -14,7 +14,6 @@ def family_select() -> Select:
         Family.id,
         Family.village_id,
         Village.name.label("village_name"),
-        Family.house_number,
         Family.head_of_family,
         Family.contact_number,
         Family.alternate_number,
@@ -26,13 +25,12 @@ def family_select() -> Select:
 
 
 def member_select() -> Select:
-    """Member joined with its family's village/house number, columns ordered for schemas.Member."""
+    """Member joined with its family's village, columns ordered for schemas.Member."""
     return select(
         Member.id,
         Member.family_id,
         Family.village_id,
         Village.name.label("village_name"),
-        Family.house_number,
         Member.full_name,
         Member.gender,
         Member.dob,

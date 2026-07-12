@@ -165,7 +165,7 @@ function VillageDetailPage() {
                     params={{ familyId: family.id }}
                     className="text-sm text-foreground hover:text-primary"
                   >
-                    {family.headOfFamily} · {family.houseNumber}
+                    {family.headOfFamily}
                   </Link>
                 </li>
               ))}
