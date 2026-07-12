@@ -4,13 +4,9 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 
 import {
   Baby,
   Building2,
-  Church,
-  Droplet,
-  Gem,
   Heart,
   House,
   PersonStanding,
-  ShieldCheck,
   UserRound,
   Users,
   Venus,
@@ -51,6 +47,20 @@ function SectionLabel({ children }: { children: string }) {
   );
 }
 
+// Fixed identity -> color mapping (never assigned by rank/count) so a status keeps
+// its color regardless of filtering or how the other categories shift.
+const MARITAL_STATUS_COLORS: Record<string, string> = {
+  Married: "var(--color-chart-1)",
+  Unmarried: "var(--color-chart-2)",
+  Single: "var(--color-chart-3)",
+  Widowed: "var(--color-chart-4)",
+};
+const MARITAL_STATUS_FALLBACK_COLOR = "var(--color-chart-5)";
+
+function maritalStatusColor(status: string) {
+  return MARITAL_STATUS_COLORS[status] ?? MARITAL_STATUS_FALLBACK_COLOR;
+}
+
 function DashboardPage() {
   const query = useQuery({ queryKey: ["dashboard"], queryFn: getDashboardData });
 
@@ -68,6 +78,7 @@ function DashboardPage() {
     stats,
     villagePopulation,
     genderDistribution,
+    maritalStatusDistribution,
     occupationDistribution,
     ageDistribution,
     timeline,
@@ -137,33 +148,8 @@ function DashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-3">
-        <SectionLabel>Sacramental Milestones</SectionLabel>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <DashboardStatCard title="Baptized" value={stats.baptized} icon={Droplet} tone="accent" />
-          <DashboardStatCard
-            title="First Communion"
-            value={stats.firstCommunion}
-            icon={Gem}
-            tone="accent"
-          />
-          <DashboardStatCard
-            title="Confirmation"
-            value={stats.confirmation}
-            icon={ShieldCheck}
-            tone="accent"
-          />
-          <DashboardStatCard
-            title="Church Marriage"
-            value={stats.churchMarriage}
-            icon={Church}
-            tone="accent"
-          />
-        </div>
-      </section>
-
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <Card className="panel-surface xl:col-span-2">
+        <Card className="panel-surface xl:col-span-2 xl:row-span-2">
           <CardHeader>
             <CardTitle>Village-wise Population</CardTitle>
           </CardHeader>
@@ -204,7 +190,7 @@ function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              className="h-[260px] w-full"
+              className="h-[180px] w-full"
               config={{
                 Male: { label: "Male", color: "var(--color-chart-1)" },
                 Female: { label: "Female", color: "var(--color-chart-3)" },
@@ -216,8 +202,8 @@ function DashboardPage() {
                   data={genderDistribution}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={55}
-                  outerRadius={92}
+                  innerRadius={38}
+                  outerRadius={64}
                 >
                   {genderDistribution.map((entry) => (
                     <Cell key={entry.name} fill={`var(--color-${entry.name})`} />
@@ -226,6 +212,45 @@ function DashboardPage() {
                 <ChartLegend content={<ChartLegendContent nameKey="name" />} />
               </PieChart>
             </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="panel-surface">
+          <CardHeader>
+            <CardTitle>Marital Status Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {maritalStatusDistribution.length === 0 ? (
+              <p className="py-16 text-center text-sm text-muted-foreground">
+                No marital status recorded yet.
+              </p>
+            ) : (
+              <ChartContainer
+                className="h-[180px] w-full"
+                config={Object.fromEntries(
+                  maritalStatusDistribution.map((entry) => [
+                    entry.name,
+                    { label: entry.name, color: maritalStatusColor(entry.name) },
+                  ]),
+                )}
+              >
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                  <Pie
+                    data={maritalStatusDistribution}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={38}
+                    outerRadius={64}
+                  >
+                    {maritalStatusDistribution.map((entry) => (
+                      <Cell key={entry.name} fill={maritalStatusColor(entry.name)} />
+                    ))}
+                  </Pie>
+                  <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                </PieChart>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
       </section>

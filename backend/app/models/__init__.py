@@ -1,3 +1,3 @@
-from app.models.census import Family, MasterDataItem, Member, Village
+from app.models.census import Family, Member, Village
 
-__all__ = ["Village", "Family", "Member", "MasterDataItem"]
+__all__ = ["Village", "Family", "Member"]

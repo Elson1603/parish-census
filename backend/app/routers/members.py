@@ -79,16 +79,16 @@ async def create_member(payload: schemas.MemberCreate, db: AsyncSession = Depend
         gender=payload.gender,
         dob=payload.dob,
         photo_url=payload.photo_url,
-        blood_group=payload.blood_group,
+        blood_group=payload.blood_group or "",
         mobile=payload.mobile,
         email=payload.email,
-        occupation=payload.occupation,
-        education=payload.education,
+        occupation=payload.occupation or "",
+        education=payload.education or "",
         baptized=payload.baptized,
         first_communion=payload.first_communion,
         confirmation=payload.confirmation,
         church_marriage=payload.church_marriage,
-        church_group=payload.church_group,
+        church_group=payload.church_group or "",
         relationship_with_head=payload.relationship_with_head,
         marital_status=payload.marital_status,
         special_needs=payload.special_needs,
@@ -118,20 +118,30 @@ async def update_member(member_id: str, payload: schemas.MemberCreate, db: Async
     member.gender = payload.gender
     member.dob = payload.dob
     member.photo_url = payload.photo_url
-    member.blood_group = payload.blood_group
     member.mobile = payload.mobile
     member.email = payload.email
-    member.occupation = payload.occupation
-    member.education = payload.education
     member.baptized = payload.baptized
     member.first_communion = payload.first_communion
     member.confirmation = payload.confirmation
     member.church_marriage = payload.church_marriage
-    member.church_group = payload.church_group
     member.relationship_with_head = payload.relationship_with_head
     member.marital_status = payload.marital_status
-    member.special_needs = payload.special_needs
     member.remarks = payload.remarks
+
+    # occupation/education/church_group/blood_group/special_needs no longer have
+    # form controls in the admin Add/Edit Member UI (master data was removed), so
+    # a payload that omits them (None) must leave the existing value untouched -
+    # not overwrite data a member already has from the census intake flow.
+    if payload.occupation is not None:
+        member.occupation = payload.occupation
+    if payload.education is not None:
+        member.education = payload.education
+    if payload.church_group is not None:
+        member.church_group = payload.church_group
+    if payload.blood_group is not None:
+        member.blood_group = payload.blood_group
+    if payload.special_needs is not None:
+        member.special_needs = payload.special_needs
     await db.commit()
 
     row = (await db.execute(member_select().where(Member.id == member.id))).first()

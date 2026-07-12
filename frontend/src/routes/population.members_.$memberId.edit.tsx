@@ -7,16 +7,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { CalendarIcon } from "lucide-react";
 import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
-import {
-  getFamilies,
-  getMasterData,
-  getMemberById,
-  getVillages,
-  updateMember,
-} from "@/services/census.service";
+import { getFamilies, getMemberById, getVillages, updateMember } from "@/services/census.service";
 import { getApiErrorMessage } from "@/lib/api-error";
+import { MARITAL_STATUS_OPTIONS } from "@/constants/census-form-options";
 import { memberFormSchema, type MemberFormValues } from "@/types/forms";
-import { calculateAge, toIsoDate } from "@/utils/date";
+import { calculateAge, parseIsoDate, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,30 +51,6 @@ function EditMemberPage() {
     queryFn: () => getMemberById(memberId),
   });
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
-  const occupationsQuery = useQuery({
-    queryKey: ["master", "occupations"],
-    queryFn: () => getMasterData("occupations"),
-  });
-  const educationQuery = useQuery({
-    queryKey: ["master", "education"],
-    queryFn: () => getMasterData("education"),
-  });
-  const churchGroupsQuery = useQuery({
-    queryKey: ["master", "churchGroups"],
-    queryFn: () => getMasterData("churchGroups"),
-  });
-  const maritalStatusQuery = useQuery({
-    queryKey: ["master", "maritalStatus"],
-    queryFn: () => getMasterData("maritalStatus"),
-  });
-  const bloodGroupsQuery = useQuery({
-    queryKey: ["master", "bloodGroups"],
-    queryFn: () => getMasterData("bloodGroups"),
-  });
-  const specialNeedsQuery = useQuery({
-    queryKey: ["master", "specialNeeds"],
-    queryFn: () => getMasterData("specialNeeds"),
-  });
 
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
@@ -89,21 +60,16 @@ function EditMemberPage() {
       dob: "",
       age: 0,
       photoUrl: "",
-      bloodGroup: "",
       mobile: "",
       email: "",
-      occupation: "",
-      education: "",
       baptized: false,
       firstCommunion: false,
       confirmation: false,
       churchMarriage: false,
-      churchGroup: "",
       villageId: "",
       familyId: "",
       relationshipWithHead: "",
       maritalStatus: "",
-      specialNeeds: "",
       remarks: "",
     },
   });
@@ -117,21 +83,16 @@ function EditMemberPage() {
       dob: member.dob,
       age: member.age,
       photoUrl: member.photoUrl ?? "",
-      bloodGroup: member.bloodGroup,
       mobile: member.mobile,
       email: member.email ?? "",
-      occupation: member.occupation,
-      education: member.education,
       baptized: member.baptized,
       firstCommunion: member.firstCommunion,
       confirmation: member.confirmation,
       churchMarriage: member.churchMarriage,
-      churchGroup: member.churchGroup,
       villageId: member.villageId,
       familyId: member.familyId,
       relationshipWithHead: member.relationshipWithHead,
       maritalStatus: member.maritalStatus,
-      specialNeeds: member.specialNeeds ?? "",
       remarks: member.remarks ?? "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,25 +107,8 @@ function EditMemberPage() {
 
   useUnsavedChangesWarning(form.formState.isDirty);
 
-  const loading =
-    memberQuery.isLoading ||
-    villagesQuery.isLoading ||
-    occupationsQuery.isLoading ||
-    educationQuery.isLoading ||
-    churchGroupsQuery.isLoading ||
-    maritalStatusQuery.isLoading ||
-    bloodGroupsQuery.isLoading ||
-    specialNeedsQuery.isLoading;
-
-  const hasError =
-    memberQuery.isError ||
-    villagesQuery.isError ||
-    occupationsQuery.isError ||
-    educationQuery.isError ||
-    churchGroupsQuery.isError ||
-    maritalStatusQuery.isError ||
-    bloodGroupsQuery.isError ||
-    specialNeedsQuery.isError;
+  const loading = memberQuery.isLoading || villagesQuery.isLoading || familiesQuery.isLoading;
+  const hasError = memberQuery.isError || villagesQuery.isError || familiesQuery.isError;
 
   if (loading) return <LoadingSpinner label="Loading member..." />;
   if (hasError)
@@ -245,7 +189,7 @@ function EditMemberPage() {
               control={form.control}
               name="dob"
               render={({ field }) => {
-                const value = field.value ? new Date(field.value) : undefined;
+                const value = field.value ? parseIsoDate(field.value) : undefined;
 
                 return (
                   <FormItem>
@@ -387,7 +331,7 @@ function EditMemberPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="relationshipWithHead"
@@ -414,34 +358,9 @@ function EditMemberPage() {
                         <SelectValue placeholder="Select marital status" />
                       </SelectTrigger>
                       <SelectContent>
-                        {maritalStatusQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="bloodGroup"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Blood Group</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select blood group" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bloodGroupsQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
+                        {MARITAL_STATUS_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -453,123 +372,19 @@ function EditMemberPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="occupation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Occupation</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select occupation" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {occupationsQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="education"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Education</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select education" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {educationQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="churchGroup"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Church Group</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select church group" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {churchGroupsQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </section>
-
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="specialNeeds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Special Needs</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select special needs" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {specialNeedsQuery.data?.map((item) => (
-                          <SelectItem key={item.id} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="photoUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Photo URL (optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </section>
+          <FormField
+            control={form.control}
+            name="photoUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Photo URL (optional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <FormField

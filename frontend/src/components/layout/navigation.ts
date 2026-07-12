@@ -1,11 +1,8 @@
 import {
   BarChart3,
   Building2,
-  ClipboardList,
-  HeartHandshake,
   Home,
   LayoutDashboard,
-  Layers3,
   Settings,
   Users,
   UserSquare,
@@ -43,19 +40,6 @@ export const navSections: NavSection[] = [
       { title: "Villages", to: "/population/villages", icon: Building2 },
       { title: "Families", to: "/population/families", icon: UserSquare },
       { title: "Members", to: "/population/members", icon: Users },
-    ],
-  },
-  {
-    title: "Master Data",
-    to: "/master/occupations",
-    icon: Layers3,
-    children: [
-      { title: "Occupations", to: "/master/occupations", icon: ClipboardList },
-      { title: "Education", to: "/master/education", icon: ClipboardList },
-      { title: "Church Groups", to: "/master/church-groups", icon: HeartHandshake },
-      { title: "Marital Status", to: "/master/marital-status", icon: ClipboardList },
-      { title: "Blood Groups", to: "/master/blood-groups", icon: ClipboardList },
-      { title: "Special Needs", to: "/master/special-needs", icon: ClipboardList },
     ],
   },
   {

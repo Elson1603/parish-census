@@ -82,17 +82,12 @@ export interface DashboardData {
   stats: DashboardStats;
   villagePopulation: ChartDatum[];
   genderDistribution: ChartDatum[];
+  maritalStatusDistribution: ChartDatum[];
   occupationDistribution: ChartDatum[];
   ageDistribution: ChartDatum[];
   recentFamilies: Family[];
   recentMembers: Member[];
   timeline: ActivityItem[];
-}
-
-export interface EntityItem {
-  id: string;
-  name: string;
-  createdAt: string;
 }
 
 export interface ReportFilter {
@@ -112,14 +107,6 @@ export interface ReportResultRow {
   male: number;
   female: number;
 }
-
-export type MasterDataKey =
-  | "occupations"
-  | "education"
-  | "churchGroups"
-  | "maritalStatus"
-  | "bloodGroups"
-  | "specialNeeds";
 
 export type ReportType =
   | "village-population"

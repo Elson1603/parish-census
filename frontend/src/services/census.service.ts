@@ -1,8 +1,6 @@
 import type {
   DashboardData,
-  EntityItem,
   Family,
-  MasterDataKey,
   Member,
   ReportFilter,
   ReportResultRow,
@@ -16,7 +14,6 @@ export const censusQueryKeys = {
   families: ["families"] as const,
   familyById: (familyId: string) => ["family", familyId] as const,
   members: ["members"] as const,
-  masterData: (key: MasterDataKey) => ["master", key] as const,
   reports: (reportType: string, filter: ReportFilter) => ["reports", reportType, filter] as const,
 };
 
@@ -76,25 +73,6 @@ export async function getMembers(filters?: MemberFilters) {
 export async function getMemberById(memberId: string) {
   const response = await apiClient.get<Member>(`/members/${memberId}`);
   return response.data;
-}
-
-export async function getMasterData(key: MasterDataKey) {
-  const response = await apiClient.get<EntityItem[]>(`/master-data/${key}`);
-  return response.data;
-}
-
-export async function createMasterDataItem(key: MasterDataKey, name: string) {
-  const response = await apiClient.post<EntityItem>(`/master-data/${key}`, { name });
-  return response.data;
-}
-
-export async function updateMasterDataItem(key: MasterDataKey, id: string, name: string) {
-  const response = await apiClient.put<EntityItem>(`/master-data/${key}/${id}`, { name });
-  return response.data;
-}
-
-export async function deleteMasterDataItem(key: MasterDataKey, id: string) {
-  await apiClient.delete(`/master-data/${key}/${id}`);
 }
 
 export async function getReports(reportType: string, filter: ReportFilter) {

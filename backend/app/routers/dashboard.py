@@ -86,6 +86,25 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         schemas.ChartDatum(name=name, value=value) for name, value in occupation_rows
     ]
 
+    marital_status_rows = (
+        await db.execute(
+            select(Member.marital_status, func.count(Member.id))
+            .where(Member.marital_status != "")
+            .group_by(Member.marital_status)
+            .order_by(func.count(Member.id).desc())
+        )
+    ).all()
+    # Married/Unmarried always show in the legend (even at 0), same as Gender
+    # always showing both Male and Female; any other status in use (e.g. Single,
+    # Widowed from the admin-entered master data list) is appended afterward.
+    marital_status_counts = dict(marital_status_rows)
+    marital_status_distribution = [
+        schemas.ChartDatum(name="Married", value=marital_status_counts.pop("Married", 0)),
+        schemas.ChartDatum(name="Unmarried", value=marital_status_counts.pop("Unmarried", 0)),
+    ] + [
+        schemas.ChartDatum(name=name, value=value) for name, value in marital_status_counts.items()
+    ]
+
     age_distribution = [
         schemas.ChartDatum(name="0-12", value=stats_row.children),
         schemas.ChartDatum(name="13-25", value=stats_row.youth),
@@ -147,6 +166,7 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         stats=stats,
         village_population=village_population,
         gender_distribution=gender_distribution,
+        marital_status_distribution=marital_status_distribution,
         occupation_distribution=occupation_distribution,
         age_distribution=age_distribution,
         recent_families=recent_families,

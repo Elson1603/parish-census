@@ -7,18 +7,6 @@ _email_adapter = TypeAdapter(EmailStr)
 
 Gender = Literal["Male", "Female"]
 
-MASTER_DATA_KEYS = (
-    "occupations",
-    "education",
-    "churchGroups",
-    "maritalStatus",
-    "bloodGroups",
-    "specialNeeds",
-)
-MasterDataKey = Literal[
-    "occupations", "education", "churchGroups", "maritalStatus", "bloodGroups", "specialNeeds"
-]
-
 
 def _blank_to_none(value: str | None) -> str | None:
     if value is None:
@@ -94,16 +82,20 @@ class MemberBase(BaseModel):
     gender: Gender
     dob: date
     photo_url: str | None = Field(default=None, alias="photoUrl", max_length=500)
-    blood_group: str = Field(alias="bloodGroup", min_length=1, max_length=10)
+    # occupation/education/church_group/blood_group used to be master-data-driven
+    # dropdowns; that admin feature was removed, so the admin form no longer
+    # collects them. They stay optional here so an edit that omits them doesn't
+    # wipe out values already set by the census intake flow (see update_member).
+    blood_group: str | None = Field(default=None, alias="bloodGroup", max_length=10)
     mobile: str = Field(min_length=1, max_length=20)
     email: str | None = Field(default=None, max_length=200)
-    occupation: str = Field(min_length=1, max_length=100)
-    education: str = Field(min_length=1, max_length=100)
+    occupation: str | None = Field(default=None, max_length=100)
+    education: str | None = Field(default=None, max_length=100)
     baptized: bool = False
     first_communion: bool = Field(default=False, alias="firstCommunion")
     confirmation: bool = False
     church_marriage: bool = Field(default=False, alias="churchMarriage")
-    church_group: str = Field(alias="churchGroup", min_length=1, max_length=100)
+    church_group: str | None = Field(default=None, alias="churchGroup", max_length=100)
     relationship_with_head: str = Field(alias="relationshipWithHead", min_length=1, max_length=50)
     marital_status: str = Field(alias="maritalStatus", min_length=1, max_length=50)
     special_needs: str | None = Field(default=None, alias="specialNeeds", max_length=100)
@@ -111,7 +103,10 @@ class MemberBase(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    @field_validator("photo_url", "email", "special_needs", "remarks", mode="before")
+    @field_validator(
+        "photo_url", "email", "occupation", "education", "church_group", "blood_group",
+        "special_needs", "remarks", mode="before",
+    )
     @classmethod
     def _blank(cls, value: str | None) -> str | None:
         return _blank_to_none(value)
@@ -150,22 +145,6 @@ class Member(BaseModel):
     special_needs: str | None = Field(default=None, serialization_alias="specialNeeds")
     remarks: str | None = None
     created_at: datetime = Field(serialization_alias="createdAt")
-
-
-class EntityItem(BaseModel):
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-
-    id: str
-    name: str
-    created_at: datetime = Field(serialization_alias="createdAt")
-
-
-class MasterDataCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-
-
-class MasterDataUpdate(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
 
 
 class ChartDatum(BaseModel):
@@ -207,6 +186,9 @@ class DashboardData(BaseModel):
     stats: DashboardStats
     village_population: list[ChartDatum] = Field(serialization_alias="villagePopulation")
     gender_distribution: list[ChartDatum] = Field(serialization_alias="genderDistribution")
+    marital_status_distribution: list[ChartDatum] = Field(
+        serialization_alias="maritalStatusDistribution"
+    )
     occupation_distribution: list[ChartDatum] = Field(serialization_alias="occupationDistribution")
     age_distribution: list[ChartDatum] = Field(serialization_alias="ageDistribution")
     recent_families: list[Family] = Field(serialization_alias="recentFamilies")
@@ -255,6 +237,7 @@ class CensusMemberIntake(BaseModel):
     phone: str | None = None
     dob: date
     gender: Gender
+    marital_status: str | None = Field(default=None, alias="maritalStatus")
     relation: str
     education: str | None = None
     job: str | None = None

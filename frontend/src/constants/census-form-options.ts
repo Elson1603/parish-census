@@ -45,10 +45,11 @@ export const EDUCATION_OPTIONS = [
   "Pursuing Postgraduation",
 ];
 
-export const JOB_OPTIONS = ["Service", "Business", "Teacher", "Nurse"];
+export const JOB_OPTIONS = ["Service", "Business", "Teacher", "Nurse", "Self Employed"];
 
 export const CHURCH_GROUP_OPTIONS = [
   "Sunday School Teacher",
+  "Sunday School Student",
   "Youth Group Member",
   "Charismatic Group Member",
   "Choir Group Member",
@@ -62,3 +63,5 @@ export const CHURCH_GROUP_OPTIONS = [
   "Altar Service Group",
   "Ordinary Ministers (Communion)",
 ];
+
+export const MARITAL_STATUS_OPTIONS = ["Married", "Unmarried"];

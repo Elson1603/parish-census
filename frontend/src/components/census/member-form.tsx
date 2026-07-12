@@ -5,6 +5,7 @@ import {
   CHURCH_GROUP_OPTIONS,
   EDUCATION_OPTIONS,
   JOB_OPTIONS,
+  MARITAL_STATUS_OPTIONS,
   OTHER_VALUE,
   RELATION_OPTIONS,
 } from "@/constants/census-form-options";
@@ -13,7 +14,7 @@ import {
   type CensusMemberInput,
   type OptionWithOther,
 } from "@/types/census-intake";
-import { calculateAge, toIsoDate } from "@/utils/date";
+import { calculateAge, parseIsoDate, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { SelectWithOther } from "@/components/census/select-with-other";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,7 @@ export function MemberForm({
   const [member, setMember] = useState<CensusMemberInput>(() => createEmptyMember(isHead));
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const dobDate = member.dob ? new Date(member.dob) : undefined;
+  const dobDate = member.dob ? parseIsoDate(member.dob) : undefined;
 
   const handleSubmit = () => {
     const nextErrors: FormErrors = {};
@@ -129,6 +130,25 @@ export function MemberForm({
             {errors.gender ? (
               <p className="text-xs font-medium text-destructive">{errors.gender}</p>
             ) : null}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="member-marital-status">Marital Status</Label>
+            <Select
+              value={member.maritalStatus}
+              onValueChange={(maritalStatus) => setMember((prev) => ({ ...prev, maritalStatus }))}
+            >
+              <SelectTrigger id="member-marital-status">
+                <SelectValue placeholder="Select marital status" />
+              </SelectTrigger>
+              <SelectContent>
+                {MARITAL_STATUS_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">

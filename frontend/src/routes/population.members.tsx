@@ -23,7 +23,7 @@ import {
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
-import { getMasterData, getMembers, getVillages } from "@/services/census.service";
+import { getMembers, getVillages } from "@/services/census.service";
 
 export const Route = createFileRoute("/population/members")({
   component: MembersPage,
@@ -32,37 +32,17 @@ export const Route = createFileRoute("/population/members")({
 function MembersPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
-  const [occupation, setOccupation] = useState("all");
-  const [education, setEducation] = useState("all");
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
-  const occupationsQuery = useQuery({
-    queryKey: ["master", "occupations"],
-    queryFn: () => getMasterData("occupations"),
-  });
-  const educationQuery = useQuery({
-    queryKey: ["master", "education"],
-    queryFn: () => getMasterData("education"),
-  });
   const membersQuery = useQuery({
-    queryKey: ["members", { search, village, occupation, education }],
-    queryFn: () => getMembers({ search, village, occupation, education }),
+    queryKey: ["members", { search, village }],
+    queryFn: () => getMembers({ search, village }),
   });
 
-  if (
-    villagesQuery.isLoading ||
-    occupationsQuery.isLoading ||
-    educationQuery.isLoading ||
-    membersQuery.isLoading
-  )
+  if (villagesQuery.isLoading || membersQuery.isLoading)
     return <LoadingSpinner label="Loading members..." />;
 
-  if (
-    villagesQuery.isError ||
-    occupationsQuery.isError ||
-    educationQuery.isError ||
-    membersQuery.isError
-  )
+  if (villagesQuery.isError || membersQuery.isError)
     return <ErrorState title="Unable to load members" description="Please retry." />;
 
   const rows = membersQuery.data ?? [];
@@ -82,7 +62,7 @@ function MembersPage() {
         }
       />
 
-      <section className="grid grid-cols-1 gap-3 md:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -97,34 +77,6 @@ function MembersPage() {
             <SelectItem value="all">All villages</SelectItem>
             {villagesQuery.data?.map((item) => (
               <SelectItem key={item.id} value={item.id}>
-                {item.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={occupation} onValueChange={setOccupation}>
-          <SelectTrigger>
-            <SelectValue placeholder="Occupation" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All occupations</SelectItem>
-            {occupationsQuery.data?.map((item) => (
-              <SelectItem key={item.id} value={item.name}>
-                {item.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={education} onValueChange={setEducation}>
-          <SelectTrigger>
-            <SelectValue placeholder="Education" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All education</SelectItem>
-            {educationQuery.data?.map((item) => (
-              <SelectItem key={item.id} value={item.name}>
                 {item.name}
               </SelectItem>
             ))}

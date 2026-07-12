@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, String, Text, UniqueConstraint, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -74,17 +74,3 @@ class Member(Base):
     family: Mapped["Family"] = relationship(back_populates="members")
 
     __table_args__ = (Index("ix_members_family_id", "family_id"),)
-
-
-class MasterDataItem(Base):
-    __tablename__ = "master_data_items"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    category: Mapped[str] = mapped_column(String(50), nullable=False)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    __table_args__ = (
-        UniqueConstraint("category", "name", name="uq_master_data_category_name"),
-        Index("ix_master_data_category", "category"),
-    )
