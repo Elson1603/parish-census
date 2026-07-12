@@ -30,7 +30,13 @@ export default defineConfig(({ command }) => ({
     ],
   },
   optimizeDeps: {
-    include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime", "react/jsx-dev-runtime"],
+    include: [
+      "react",
+      "react-dom",
+      "react-dom/client",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+    ],
     ignoreOutdatedRequests: true,
   },
   plugins: [
@@ -48,7 +54,12 @@ export default defineConfig(({ command }) => ({
       server: { entry: "server" },
     }),
     // nitro builds the deployable server output; only needed for production builds.
-    ...(command === "build" ? [nitro({ preset: "node-server" })] : []),
+    // Vercel sets VERCEL=1 during its own build, so we emit its Build Output API v3
+    // format (.vercel/output) there instead of a plain Node server bundle - Vercel's
+    // serverless runtime can't run the node-server preset's standalone server.
+    ...(command === "build"
+      ? [nitro({ preset: process.env.VERCEL ? "vercel" : "node-server" })]
+      : []),
     viteReact(),
   ],
 }));
