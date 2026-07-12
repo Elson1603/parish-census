@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { getFamilies, getMembers, getVillages } from "@/services/census.service";
+import { calculateAge } from "@/utils/date";
 
 export const Route = createFileRoute("/population/villages_/$villageId")({
   component: VillageDetailPage,
@@ -26,15 +27,26 @@ function VillageDetailPage() {
   const families = familiesQuery.data ?? [];
   const members = membersQuery.data ?? [];
 
-  const sacramentStats = useMemo(
-    () => ({
-      baptized: members.filter((item) => item.baptized).length,
-      communion: members.filter((item) => item.firstCommunion).length,
-      confirmation: members.filter((item) => item.confirmation).length,
-      marriage: members.filter((item) => item.churchMarriage).length,
-    }),
-    [members],
-  );
+  const ageGroups = useMemo(() => {
+    const buckets = { children: 0, youth: 0, adults: 0, seniors: 0 };
+    for (const member of members) {
+      const age = calculateAge(member.dob);
+      if (age <= 12) buckets.children += 1;
+      else if (age <= 25) buckets.youth += 1;
+      else if (age < 60) buckets.adults += 1;
+      else buckets.seniors += 1;
+    }
+    return buckets;
+  }, [members]);
+
+  const maritalStatusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const member of members) {
+      if (!member.maritalStatus) continue;
+      counts[member.maritalStatus] = (counts[member.maritalStatus] ?? 0) + 1;
+    }
+    return counts;
+  }, [members]);
 
   if (villagesQuery.isLoading || familiesQuery.isLoading || membersQuery.isLoading)
     return <LoadingSpinner label="Loading village details..." />;
@@ -58,7 +70,7 @@ function VillageDetailPage() {
         </Link>
         <h1 className="text-2xl font-semibold text-foreground">{village.name}</h1>
         <p className="text-sm text-muted-foreground">
-          Village-level census profile and sacramental summary.
+          Village-level census profile and demographic summary.
         </p>
       </header>
 
@@ -85,13 +97,18 @@ function VillageDetailPage() {
           <CardHeader>
             <CardTitle>Population Status</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="flex flex-wrap gap-2">
             <Badge variant="secondary">
               Male: {members.filter((item) => item.gender === "Male").length}
             </Badge>
             <Badge variant="outline">
               Female: {members.filter((item) => item.gender === "Female").length}
             </Badge>
+            {Object.entries(maritalStatusCounts).map(([status, count]) => (
+              <Badge key={status} variant="outline">
+                {status}: {count}
+              </Badge>
+            ))}
           </CardContent>
         </Card>
       </section>
@@ -99,20 +116,20 @@ function VillageDetailPage() {
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <Card className="panel-surface">
           <CardHeader>
-            <CardTitle>Sacraments</CardTitle>
+            <CardTitle>Age Groups</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Baptized: {sacramentStats.baptized}
+              Children (0-12): {ageGroups.children}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              First Communion: {sacramentStats.communion}
+              Youth (13-25): {ageGroups.youth}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Confirmation: {sacramentStats.confirmation}
+              Adults (26-59): {ageGroups.adults}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Church Marriage: {sacramentStats.marriage}
+              Seniors (60+): {ageGroups.seniors}
             </div>
           </CardContent>
         </Card>

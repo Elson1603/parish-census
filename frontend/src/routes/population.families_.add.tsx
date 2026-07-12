@@ -50,7 +50,7 @@ function AddFamilyPage() {
     },
   });
 
-  useUnsavedChangesWarning(form.formState.isDirty);
+  const unsavedChangesDialog = useUnsavedChangesWarning(form.formState.isDirty);
 
   const autoSave = useCallback(async (values: FamilyFormValues) => {
     await saveFamilyDraft(values);
@@ -233,6 +233,7 @@ function AddFamilyPage() {
           </div>
         </form>
       </Form>
+      {unsavedChangesDialog}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -24,6 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getFamilies, getVillages } from "@/services/census.service";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/population/families")({
   component: FamiliesPage,
@@ -33,11 +35,15 @@ function FamiliesPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
   const [houseNumber, setHouseNumber] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const debouncedHouseNumber = useDebouncedValue(houseNumber, 300);
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
   const familiesQuery = useQuery({
-    queryKey: ["families", { search, village, houseNumber }],
-    queryFn: () => getFamilies({ search, village, houseNumber }),
+    queryKey: ["families", { search: debouncedSearch, village, houseNumber: debouncedHouseNumber }],
+    queryFn: () =>
+      getFamilies({ search: debouncedSearch, village, houseNumber: debouncedHouseNumber }),
+    placeholderData: keepPreviousData,
   });
 
   const rows = useMemo(() => familiesQuery.data ?? [], [familiesQuery.data]);
@@ -64,7 +70,11 @@ function FamiliesPage() {
       />
 
       <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search family or village..." />
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search family or village..."
+        />
 
         <Select value={village} onValueChange={setVillage}>
           <SelectTrigger>
@@ -90,7 +100,12 @@ function FamiliesPage() {
       {rows.length === 0 ? (
         <EmptyState title="No families found" description="Adjust filters and try again." />
       ) : (
-        <section className="panel-surface rounded-lg p-3">
+        <section
+          className={cn(
+            "panel-surface rounded-lg p-3 transition-opacity",
+            familiesQuery.isFetching && "opacity-60",
+          )}
+        >
           <Table>
             <TableHeader>
               <TableRow>

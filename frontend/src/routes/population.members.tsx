@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -24,6 +24,8 @@ import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { getMembers, getVillages } from "@/services/census.service";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/population/members")({
   component: MembersPage,
@@ -32,11 +34,13 @@ export const Route = createFileRoute("/population/members")({
 function MembersPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
+  const debouncedSearch = useDebouncedValue(search, 300);
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
   const membersQuery = useQuery({
-    queryKey: ["members", { search, village }],
-    queryFn: () => getMembers({ search, village }),
+    queryKey: ["members", { search: debouncedSearch, village }],
+    queryFn: () => getMembers({ search: debouncedSearch, village }),
+    placeholderData: keepPreviousData,
   });
 
   if (villagesQuery.isLoading || membersQuery.isLoading)
@@ -87,7 +91,12 @@ function MembersPage() {
       {rows.length === 0 ? (
         <EmptyState title="No members found" description="Try changing filters." />
       ) : (
-        <section className="panel-surface rounded-lg p-3">
+        <section
+          className={cn(
+            "panel-surface rounded-lg p-3 transition-opacity",
+            membersQuery.isFetching && "opacity-60",
+          )}
+        >
           <Table>
             <TableHeader>
               <TableRow>

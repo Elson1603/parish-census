@@ -87,7 +87,9 @@ class MemberBase(BaseModel):
     # collects them. They stay optional here so an edit that omits them doesn't
     # wipe out values already set by the census intake flow (see update_member).
     blood_group: str | None = Field(default=None, alias="bloodGroup", max_length=10)
-    mobile: str = Field(min_length=1, max_length=20)
+    # Not required: the Edit Member form mirrors the census intake wizard, which
+    # never requires a phone number either.
+    mobile: str = Field(default="", max_length=20)
     email: str | None = Field(default=None, max_length=200)
     occupation: str | None = Field(default=None, max_length=100)
     education: str | None = Field(default=None, max_length=100)
@@ -97,7 +99,8 @@ class MemberBase(BaseModel):
     church_marriage: bool = Field(default=False, alias="churchMarriage")
     church_group: str | None = Field(default=None, alias="churchGroup", max_length=100)
     relationship_with_head: str = Field(alias="relationshipWithHead", min_length=1, max_length=50)
-    marital_status: str = Field(alias="maritalStatus", min_length=1, max_length=50)
+    # Not required: matches the census intake wizard, where marital status is optional.
+    marital_status: str = Field(default="", alias="maritalStatus", max_length=50)
     special_needs: str | None = Field(default=None, alias="specialNeeds", max_length=100)
     remarks: str | None = None
 

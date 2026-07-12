@@ -74,7 +74,7 @@ function AddMemberPage() {
     queryFn: () => getFamilies({ village: selectedVillageId || "all" }),
   });
 
-  useUnsavedChangesWarning(form.formState.isDirty);
+  const unsavedChangesDialog = useUnsavedChangesWarning(form.formState.isDirty);
   useAutoSaveDraft(form.watch(), form.formState.isDirty, async (values) => {
     await saveMemberDraft(values);
   });
@@ -436,6 +436,7 @@ function AddMemberPage() {
           </div>
         </form>
       </Form>
+      {unsavedChangesDialog}
     </div>
   );
 }
