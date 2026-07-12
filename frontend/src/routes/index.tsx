@@ -31,6 +31,7 @@ function buildFamilyPayload(family: CensusFamilyInput) {
       name: member.name,
       phone: member.phone || undefined,
       dob: member.dob,
+      gender: member.gender,
       relation: member.isHead ? "Head of Family" : resolveOptionLabel(member.relation),
       education: resolveOptionLabel(member.education) || undefined,
       job: resolveOptionLabel(member.job) || undefined,

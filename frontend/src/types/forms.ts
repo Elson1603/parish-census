@@ -45,7 +45,6 @@ export const memberFormSchema = z.object({
   churchGroup: z.string().min(1, "Church group is required"),
   villageId: z.string().min(1, "Village is required"),
   familyId: z.string().min(1, "Family is required"),
-  houseNumber: z.string().min(1, "House number is required"),
   relationshipWithHead: z.string().min(1, "Relationship is required"),
   maritalStatus: z.string().min(1, "Marital status is required"),
   specialNeeds: z.string().optional().or(z.literal("")),

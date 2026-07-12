@@ -96,3 +96,38 @@ async def create_member(payload: schemas.MemberCreate, db: AsyncSession = Depend
 
     row = (await db.execute(member_select().where(Member.id == member.id))).first()
     return schemas.Member.model_validate(dict(row._mapping))
+
+
+@router.put("/{member_id}", response_model=schemas.Member)
+async def update_member(member_id: str, payload: schemas.MemberCreate, db: AsyncSession = Depends(get_db)):
+    member = await db.get(Member, member_id)
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    family = await db.get(Family, payload.family_id)
+    if not family:
+        raise HTTPException(status_code=404, detail="Family not found")
+
+    member.family_id = payload.family_id
+    member.full_name = payload.full_name
+    member.gender = payload.gender
+    member.dob = payload.dob
+    member.photo_url = payload.photo_url
+    member.blood_group = payload.blood_group
+    member.mobile = payload.mobile
+    member.email = payload.email
+    member.occupation = payload.occupation
+    member.education = payload.education
+    member.baptized = payload.baptized
+    member.first_communion = payload.first_communion
+    member.confirmation = payload.confirmation
+    member.church_marriage = payload.church_marriage
+    member.church_group = payload.church_group
+    member.relationship_with_head = payload.relationship_with_head
+    member.marital_status = payload.marital_status
+    member.special_needs = payload.special_needs
+    member.remarks = payload.remarks
+    await db.commit()
+
+    row = (await db.execute(member_select().where(Member.id == member.id))).first()
+    return schemas.Member.model_validate(dict(row._mapping))

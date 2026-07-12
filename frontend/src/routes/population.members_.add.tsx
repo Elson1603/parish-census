@@ -29,7 +29,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -37,7 +43,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 
-export const Route = createFileRoute("/population/members/add")({
+export const Route = createFileRoute("/population/members_/add")({
   component: AddMemberPage,
 });
 
@@ -88,7 +94,6 @@ function AddMemberPage() {
       churchGroup: "",
       villageId: "",
       familyId: "",
-      houseNumber: "",
       relationshipWithHead: "",
       maritalStatus: "",
       specialNeeds: "",
@@ -143,11 +148,16 @@ function AddMemberPage() {
           ← Back to members
         </Link>
         <h1 className="text-2xl font-semibold text-foreground">Add Member</h1>
-        <p className="text-sm text-muted-foreground">Register a parish member with household and sacramental details.</p>
+        <p className="text-sm text-muted-foreground">
+          Register a parish member with household and sacramental details.
+        </p>
       </header>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="panel-surface space-y-5 rounded-lg p-4">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="panel-surface space-y-5 rounded-lg p-4"
+        >
           <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -273,7 +283,7 @@ function AddMemberPage() {
             />
           </section>
 
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="villageId"
@@ -286,7 +296,6 @@ function AddMemberPage() {
                       onValueChange={(value) => {
                         field.onChange(value);
                         form.setValue("familyId", "");
-                        form.setValue("houseNumber", "");
                       }}
                     >
                       <SelectTrigger>
@@ -313,14 +322,7 @@ function AddMemberPage() {
                 <FormItem>
                   <FormLabel>Family</FormLabel>
                   <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        const family = familiesQuery.data?.find((item) => item.id === value);
-                        form.setValue("houseNumber", family?.houseNumber ?? "", { shouldValidate: true });
-                      }}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select family" />
                       </SelectTrigger>
@@ -332,20 +334,6 @@ function AddMemberPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="houseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>House Number</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -544,7 +532,10 @@ function AddMemberPage() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 rounded-md border border-border p-3">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                    />
                   </FormControl>
                   <FormLabel className="m-0">Baptized</FormLabel>
                 </FormItem>
@@ -556,7 +547,10 @@ function AddMemberPage() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 rounded-md border border-border p-3">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                    />
                   </FormControl>
                   <FormLabel className="m-0">First Communion</FormLabel>
                 </FormItem>
@@ -568,7 +562,10 @@ function AddMemberPage() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 rounded-md border border-border p-3">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                    />
                   </FormControl>
                   <FormLabel className="m-0">Confirmation</FormLabel>
                 </FormItem>
@@ -580,7 +577,10 @@ function AddMemberPage() {
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 rounded-md border border-border p-3">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={(checked) => field.onChange(checked === true)} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                    />
                   </FormControl>
                   <FormLabel className="m-0">Church Marriage</FormLabel>
                 </FormItem>

@@ -13,7 +13,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
@@ -30,17 +36,33 @@ function MembersPage() {
   const [education, setEducation] = useState("all");
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
-  const occupationsQuery = useQuery({ queryKey: ["master", "occupations"], queryFn: () => getMasterData("occupations") });
-  const educationQuery = useQuery({ queryKey: ["master", "education"], queryFn: () => getMasterData("education") });
+  const occupationsQuery = useQuery({
+    queryKey: ["master", "occupations"],
+    queryFn: () => getMasterData("occupations"),
+  });
+  const educationQuery = useQuery({
+    queryKey: ["master", "education"],
+    queryFn: () => getMasterData("education"),
+  });
   const membersQuery = useQuery({
     queryKey: ["members", { search, village, occupation, education }],
     queryFn: () => getMembers({ search, village, occupation, education }),
   });
 
-  if (villagesQuery.isLoading || occupationsQuery.isLoading || educationQuery.isLoading || membersQuery.isLoading)
+  if (
+    villagesQuery.isLoading ||
+    occupationsQuery.isLoading ||
+    educationQuery.isLoading ||
+    membersQuery.isLoading
+  )
     return <LoadingSpinner label="Loading members..." />;
 
-  if (villagesQuery.isError || occupationsQuery.isError || educationQuery.isError || membersQuery.isError)
+  if (
+    villagesQuery.isError ||
+    occupationsQuery.isError ||
+    educationQuery.isError ||
+    membersQuery.isError
+  )
     return <ErrorState title="Unable to load members" description="Please retry." />;
 
   const rows = membersQuery.data ?? [];
@@ -61,7 +83,11 @@ function MembersPage() {
       />
 
       <section className="grid grid-cols-1 gap-3 md:grid-cols-4">
-        <Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search member..." />
+        <Input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search member..."
+        />
 
         <Select value={village} onValueChange={setVillage}>
           <SelectTrigger>
@@ -120,6 +146,7 @@ function MembersPage() {
                 <TableHead>Age</TableHead>
                 <TableHead>Mobile</TableHead>
                 <TableHead>Occupation</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -132,6 +159,16 @@ function MembersPage() {
                   <TableCell>{member.age}</TableCell>
                   <TableCell>{member.mobile}</TableCell>
                   <TableCell>{member.occupation}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" asChild>
+                      <Link
+                        to="/population/members/$memberId/edit"
+                        params={{ memberId: member.id }}
+                      >
+                        Edit
+                      </Link>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

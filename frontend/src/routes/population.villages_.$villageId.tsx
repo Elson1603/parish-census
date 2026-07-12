@@ -7,23 +7,22 @@ import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { getFamilies, getMembers, getVillages } from "@/services/census.service";
 
-export const Route = createFileRoute("/population/villages/$villageId")({
+export const Route = createFileRoute("/population/villages_/$villageId")({
   component: VillageDetailPage,
 });
 
 function VillageDetailPage() {
   const { villageId } = Route.useParams();
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
-  const familiesQuery = useQuery({ queryKey: ["families", { village: villageId }], queryFn: () => getFamilies({ village: villageId }) });
-  const membersQuery = useQuery({ queryKey: ["members", { village: villageId }], queryFn: () => getMembers({ village: villageId }) });
+  const familiesQuery = useQuery({
+    queryKey: ["families", { village: villageId }],
+    queryFn: () => getFamilies({ village: villageId }),
+  });
+  const membersQuery = useQuery({
+    queryKey: ["members", { village: villageId }],
+    queryFn: () => getMembers({ village: villageId }),
+  });
 
-  if (villagesQuery.isLoading || familiesQuery.isLoading || membersQuery.isLoading)
-    return <LoadingSpinner label="Loading village details..." />;
-
-  if (villagesQuery.isError || familiesQuery.isError || membersQuery.isError)
-    return <ErrorState title="Unable to load village" description="Please retry." />;
-
-  const village = villagesQuery.data?.find((item) => item.id === villageId);
   const families = familiesQuery.data ?? [];
   const members = membersQuery.data ?? [];
 
@@ -37,8 +36,18 @@ function VillageDetailPage() {
     [members],
   );
 
+  if (villagesQuery.isLoading || familiesQuery.isLoading || membersQuery.isLoading)
+    return <LoadingSpinner label="Loading village details..." />;
+
+  if (villagesQuery.isError || familiesQuery.isError || membersQuery.isError)
+    return <ErrorState title="Unable to load village" description="Please retry." />;
+
+  const village = villagesQuery.data?.find((item) => item.id === villageId);
+
   if (!village) {
-    return <ErrorState title="Village not found" description="The selected village does not exist." />;
+    return (
+      <ErrorState title="Village not found" description="The selected village does not exist." />
+    );
   }
 
   return (
@@ -48,7 +57,9 @@ function VillageDetailPage() {
           ← Back to villages
         </Link>
         <h1 className="text-2xl font-semibold text-foreground">{village.name}</h1>
-        <p className="text-sm text-muted-foreground">Village-level census profile and sacramental summary.</p>
+        <p className="text-sm text-muted-foreground">
+          Village-level census profile and sacramental summary.
+        </p>
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -75,8 +86,12 @@ function VillageDetailPage() {
             <CardTitle>Population Status</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Badge variant="secondary">Male: {members.filter((item) => item.gender === "Male").length}</Badge>
-            <Badge variant="outline">Female: {members.filter((item) => item.gender === "Female").length}</Badge>
+            <Badge variant="secondary">
+              Male: {members.filter((item) => item.gender === "Male").length}
+            </Badge>
+            <Badge variant="outline">
+              Female: {members.filter((item) => item.gender === "Female").length}
+            </Badge>
           </CardContent>
         </Card>
       </section>
@@ -87,10 +102,18 @@ function VillageDetailPage() {
             <CardTitle>Sacraments</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-md border border-border bg-background/70 p-3">Baptized: {sacramentStats.baptized}</div>
-            <div className="rounded-md border border-border bg-background/70 p-3">First Communion: {sacramentStats.communion}</div>
-            <div className="rounded-md border border-border bg-background/70 p-3">Confirmation: {sacramentStats.confirmation}</div>
-            <div className="rounded-md border border-border bg-background/70 p-3">Church Marriage: {sacramentStats.marriage}</div>
+            <div className="rounded-md border border-border bg-background/70 p-3">
+              Baptized: {sacramentStats.baptized}
+            </div>
+            <div className="rounded-md border border-border bg-background/70 p-3">
+              First Communion: {sacramentStats.communion}
+            </div>
+            <div className="rounded-md border border-border bg-background/70 p-3">
+              Confirmation: {sacramentStats.confirmation}
+            </div>
+            <div className="rounded-md border border-border bg-background/70 p-3">
+              Church Marriage: {sacramentStats.marriage}
+            </div>
           </CardContent>
         </Card>
 

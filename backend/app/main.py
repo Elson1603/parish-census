@@ -9,6 +9,9 @@ app = FastAPI(title="Parish Census API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
+    # Vite bumps to the next free port (8080 -> 8081 -> ...) whenever one is taken,
+    # so pin dev origins by regex instead of chasing the exact port each time.
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

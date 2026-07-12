@@ -14,10 +14,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PopulationVillagesRouteImport } from './routes/population.villages'
 import { Route as PopulationMembersRouteImport } from './routes/population.members'
 import { Route as PopulationFamiliesRouteImport } from './routes/population.families'
-import { Route as PopulationVillagesVillageIdRouteImport } from './routes/population.villages.$villageId'
-import { Route as PopulationMembersAddRouteImport } from './routes/population.members.add'
-import { Route as PopulationFamiliesAddRouteImport } from './routes/population.families.add'
-import { Route as PopulationFamiliesFamilyIdRouteImport } from './routes/population.families.$familyId'
+import { Route as PopulationVillagesVillageIdRouteImport } from './routes/population.villages_.$villageId'
+import { Route as PopulationMembersAddRouteImport } from './routes/population.members_.add'
+import { Route as PopulationFamiliesAddRouteImport } from './routes/population.families_.add'
+import { Route as PopulationFamiliesFamilyIdRouteImport } from './routes/population.families_.$familyId'
+import { Route as PopulationMembersMemberIdEditRouteImport } from './routes/population.members_.$memberId.edit'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -46,60 +47,69 @@ const PopulationFamiliesRoute = PopulationFamiliesRouteImport.update({
 } as any)
 const PopulationVillagesVillageIdRoute =
   PopulationVillagesVillageIdRouteImport.update({
-    id: '/$villageId',
-    path: '/$villageId',
-    getParentRoute: () => PopulationVillagesRoute,
+    id: '/population/villages_/$villageId',
+    path: '/population/villages/$villageId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const PopulationMembersAddRoute = PopulationMembersAddRouteImport.update({
-  id: '/add',
-  path: '/add',
-  getParentRoute: () => PopulationMembersRoute,
+  id: '/population/members_/add',
+  path: '/population/members/add',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PopulationFamiliesAddRoute = PopulationFamiliesAddRouteImport.update({
-  id: '/add',
-  path: '/add',
-  getParentRoute: () => PopulationFamiliesRoute,
+  id: '/population/families_/add',
+  path: '/population/families/add',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PopulationFamiliesFamilyIdRoute =
   PopulationFamiliesFamilyIdRouteImport.update({
-    id: '/$familyId',
-    path: '/$familyId',
-    getParentRoute: () => PopulationFamiliesRoute,
+    id: '/population/families_/$familyId',
+    path: '/population/families/$familyId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PopulationMembersMemberIdEditRoute =
+  PopulationMembersMemberIdEditRouteImport.update({
+    id: '/population/members_/$memberId/edit',
+    path: '/population/members/$memberId/edit',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/population/families': typeof PopulationFamiliesRouteWithChildren
-  '/population/members': typeof PopulationMembersRouteWithChildren
-  '/population/villages': typeof PopulationVillagesRouteWithChildren
+  '/population/families': typeof PopulationFamiliesRoute
+  '/population/members': typeof PopulationMembersRoute
+  '/population/villages': typeof PopulationVillagesRoute
   '/population/families/$familyId': typeof PopulationFamiliesFamilyIdRoute
   '/population/families/add': typeof PopulationFamiliesAddRoute
   '/population/members/add': typeof PopulationMembersAddRoute
   '/population/villages/$villageId': typeof PopulationVillagesVillageIdRoute
+  '/population/members/$memberId/edit': typeof PopulationMembersMemberIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/population/families': typeof PopulationFamiliesRouteWithChildren
-  '/population/members': typeof PopulationMembersRouteWithChildren
-  '/population/villages': typeof PopulationVillagesRouteWithChildren
+  '/population/families': typeof PopulationFamiliesRoute
+  '/population/members': typeof PopulationMembersRoute
+  '/population/villages': typeof PopulationVillagesRoute
   '/population/families/$familyId': typeof PopulationFamiliesFamilyIdRoute
   '/population/families/add': typeof PopulationFamiliesAddRoute
   '/population/members/add': typeof PopulationMembersAddRoute
   '/population/villages/$villageId': typeof PopulationVillagesVillageIdRoute
+  '/population/members/$memberId/edit': typeof PopulationMembersMemberIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
-  '/population/families': typeof PopulationFamiliesRouteWithChildren
-  '/population/members': typeof PopulationMembersRouteWithChildren
-  '/population/villages': typeof PopulationVillagesRouteWithChildren
-  '/population/families/$familyId': typeof PopulationFamiliesFamilyIdRoute
-  '/population/families/add': typeof PopulationFamiliesAddRoute
-  '/population/members/add': typeof PopulationMembersAddRoute
-  '/population/villages/$villageId': typeof PopulationVillagesVillageIdRoute
+  '/population/families': typeof PopulationFamiliesRoute
+  '/population/members': typeof PopulationMembersRoute
+  '/population/villages': typeof PopulationVillagesRoute
+  '/population/families_/$familyId': typeof PopulationFamiliesFamilyIdRoute
+  '/population/families_/add': typeof PopulationFamiliesAddRoute
+  '/population/members_/add': typeof PopulationMembersAddRoute
+  '/population/villages_/$villageId': typeof PopulationVillagesVillageIdRoute
+  '/population/members_/$memberId/edit': typeof PopulationMembersMemberIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/population/families/add'
     | '/population/members/add'
     | '/population/villages/$villageId'
+    | '/population/members/$memberId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/population/families/add'
     | '/population/members/add'
     | '/population/villages/$villageId'
+    | '/population/members/$memberId/edit'
   id:
     | '__root__'
     | '/'
@@ -131,18 +143,24 @@ export interface FileRouteTypes {
     | '/population/families'
     | '/population/members'
     | '/population/villages'
-    | '/population/families/$familyId'
-    | '/population/families/add'
-    | '/population/members/add'
-    | '/population/villages/$villageId'
+    | '/population/families_/$familyId'
+    | '/population/families_/add'
+    | '/population/members_/add'
+    | '/population/villages_/$villageId'
+    | '/population/members_/$memberId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
-  PopulationFamiliesRoute: typeof PopulationFamiliesRouteWithChildren
-  PopulationMembersRoute: typeof PopulationMembersRouteWithChildren
-  PopulationVillagesRoute: typeof PopulationVillagesRouteWithChildren
+  PopulationFamiliesRoute: typeof PopulationFamiliesRoute
+  PopulationMembersRoute: typeof PopulationMembersRoute
+  PopulationVillagesRoute: typeof PopulationVillagesRoute
+  PopulationFamiliesFamilyIdRoute: typeof PopulationFamiliesFamilyIdRoute
+  PopulationFamiliesAddRoute: typeof PopulationFamiliesAddRoute
+  PopulationMembersAddRoute: typeof PopulationMembersAddRoute
+  PopulationVillagesVillageIdRoute: typeof PopulationVillagesVillageIdRoute
+  PopulationMembersMemberIdEditRoute: typeof PopulationMembersMemberIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -182,78 +200,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PopulationFamiliesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/population/villages/$villageId': {
-      id: '/population/villages/$villageId'
-      path: '/$villageId'
+    '/population/villages_/$villageId': {
+      id: '/population/villages_/$villageId'
+      path: '/population/villages/$villageId'
       fullPath: '/population/villages/$villageId'
       preLoaderRoute: typeof PopulationVillagesVillageIdRouteImport
-      parentRoute: typeof PopulationVillagesRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/population/members/add': {
-      id: '/population/members/add'
-      path: '/add'
+    '/population/members_/add': {
+      id: '/population/members_/add'
+      path: '/population/members/add'
       fullPath: '/population/members/add'
       preLoaderRoute: typeof PopulationMembersAddRouteImport
-      parentRoute: typeof PopulationMembersRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/population/families/add': {
-      id: '/population/families/add'
-      path: '/add'
+    '/population/families_/add': {
+      id: '/population/families_/add'
+      path: '/population/families/add'
       fullPath: '/population/families/add'
       preLoaderRoute: typeof PopulationFamiliesAddRouteImport
-      parentRoute: typeof PopulationFamiliesRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/population/families/$familyId': {
-      id: '/population/families/$familyId'
-      path: '/$familyId'
+    '/population/families_/$familyId': {
+      id: '/population/families_/$familyId'
+      path: '/population/families/$familyId'
       fullPath: '/population/families/$familyId'
       preLoaderRoute: typeof PopulationFamiliesFamilyIdRouteImport
-      parentRoute: typeof PopulationFamiliesRoute
+      parentRoute: typeof rootRouteImport
+    }
+    '/population/members_/$memberId/edit': {
+      id: '/population/members_/$memberId/edit'
+      path: '/population/members/$memberId/edit'
+      fullPath: '/population/members/$memberId/edit'
+      preLoaderRoute: typeof PopulationMembersMemberIdEditRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface PopulationFamiliesRouteChildren {
-  PopulationFamiliesFamilyIdRoute: typeof PopulationFamiliesFamilyIdRoute
-  PopulationFamiliesAddRoute: typeof PopulationFamiliesAddRoute
-}
-
-const PopulationFamiliesRouteChildren: PopulationFamiliesRouteChildren = {
-  PopulationFamiliesFamilyIdRoute: PopulationFamiliesFamilyIdRoute,
-  PopulationFamiliesAddRoute: PopulationFamiliesAddRoute,
-}
-
-const PopulationFamiliesRouteWithChildren =
-  PopulationFamiliesRoute._addFileChildren(PopulationFamiliesRouteChildren)
-
-interface PopulationMembersRouteChildren {
-  PopulationMembersAddRoute: typeof PopulationMembersAddRoute
-}
-
-const PopulationMembersRouteChildren: PopulationMembersRouteChildren = {
-  PopulationMembersAddRoute: PopulationMembersAddRoute,
-}
-
-const PopulationMembersRouteWithChildren =
-  PopulationMembersRoute._addFileChildren(PopulationMembersRouteChildren)
-
-interface PopulationVillagesRouteChildren {
-  PopulationVillagesVillageIdRoute: typeof PopulationVillagesVillageIdRoute
-}
-
-const PopulationVillagesRouteChildren: PopulationVillagesRouteChildren = {
-  PopulationVillagesVillageIdRoute: PopulationVillagesVillageIdRoute,
-}
-
-const PopulationVillagesRouteWithChildren =
-  PopulationVillagesRoute._addFileChildren(PopulationVillagesRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
-  PopulationFamiliesRoute: PopulationFamiliesRouteWithChildren,
-  PopulationMembersRoute: PopulationMembersRouteWithChildren,
-  PopulationVillagesRoute: PopulationVillagesRouteWithChildren,
+  PopulationFamiliesRoute: PopulationFamiliesRoute,
+  PopulationMembersRoute: PopulationMembersRoute,
+  PopulationVillagesRoute: PopulationVillagesRoute,
+  PopulationFamiliesFamilyIdRoute: PopulationFamiliesFamilyIdRoute,
+  PopulationFamiliesAddRoute: PopulationFamiliesAddRoute,
+  PopulationMembersAddRoute: PopulationMembersAddRoute,
+  PopulationVillagesVillageIdRoute: PopulationVillagesVillageIdRoute,
+  PopulationMembersMemberIdEditRoute: PopulationMembersMemberIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

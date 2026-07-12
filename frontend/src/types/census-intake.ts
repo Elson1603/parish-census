@@ -11,6 +11,7 @@ export interface CensusMemberInput {
   name: string;
   phone: string;
   dob: string;
+  gender: string;
   relation: OptionWithOther;
   education: OptionWithOther;
   job: OptionWithOther;
@@ -40,6 +41,7 @@ export function createEmptyMember(isHead: boolean): CensusMemberInput {
     name: "",
     phone: "",
     dob: "",
+    gender: "",
     relation: createEmptyOption(),
     education: createEmptyOption(),
     job: createEmptyOption(),

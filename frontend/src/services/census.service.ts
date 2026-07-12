@@ -73,6 +73,11 @@ export async function getMembers(filters?: MemberFilters) {
   return response.data;
 }
 
+export async function getMemberById(memberId: string) {
+  const response = await apiClient.get<Member>(`/members/${memberId}`);
+  return response.data;
+}
+
 export async function getMasterData(key: MasterDataKey) {
   const response = await apiClient.get<EntityItem[]>(`/master-data/${key}`);
   return response.data;
@@ -123,6 +128,11 @@ export async function createFamily(payload: unknown) {
 
 export async function createMember(payload: unknown) {
   const response = await apiClient.post<Member>("/members", payload);
+  return response.data;
+}
+
+export async function updateMember(memberId: string, payload: unknown) {
+  const response = await apiClient.put<Member>(`/members/${memberId}`, payload);
   return response.data;
 }
 

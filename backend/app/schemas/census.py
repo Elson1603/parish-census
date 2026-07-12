@@ -254,6 +254,7 @@ class CensusMemberIntake(BaseModel):
     name: str = Field(min_length=1)
     phone: str | None = None
     dob: date
+    gender: Gender
     relation: str
     education: str | None = None
     job: str | None = None

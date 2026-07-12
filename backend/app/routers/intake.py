@@ -30,6 +30,7 @@ async def submit_family_census(payload: schemas.CensusFamilyIntake, db: AsyncSes
                 family_id=family.id,
                 full_name=member_input.name,
                 dob=member_input.dob,
+                gender=member_input.gender,
                 mobile=member_input.phone or "",
                 occupation=member_input.job or "",
                 education=member_input.education or "",

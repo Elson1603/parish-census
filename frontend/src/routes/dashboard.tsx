@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bar, BarChart, CartesianGrid, Pie, PieChart, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from "recharts";
 import {
   Baby,
   Building2,
@@ -169,18 +169,21 @@ function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              className="h-[260px] w-full"
+              className="w-full"
+              style={{ height: Math.max(260, villagePopulation.length * 32) }}
               config={{
                 members: { label: "Members", color: "var(--color-primary)" },
               }}
             >
-              <BarChart data={villagePopulation}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis
+              <BarChart data={villagePopulation} layout="vertical" margin={{ left: 24 }}>
+                <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                <XAxis type="number" tickLine={false} axisLine={false} />
+                <YAxis
+                  type="category"
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  interval={0}
+                  width={160}
                   tick={{ fontSize: 11 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
@@ -188,7 +191,7 @@ function DashboardPage() {
                   dataKey="value"
                   name="members"
                   fill="var(--color-members)"
-                  radius={[6, 6, 0, 0]}
+                  radius={[0, 6, 6, 0]}
                 />
               </BarChart>
             </ChartContainer>
@@ -215,7 +218,11 @@ function DashboardPage() {
                   nameKey="name"
                   innerRadius={55}
                   outerRadius={92}
-                />
+                >
+                  {genderDistribution.map((entry) => (
+                    <Cell key={entry.name} fill={`var(--color-${entry.name})`} />
+                  ))}
+                </Pie>
                 <ChartLegend content={<ChartLegendContent nameKey="name" />} />
               </PieChart>
             </ChartContainer>

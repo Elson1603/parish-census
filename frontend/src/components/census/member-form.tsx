@@ -23,9 +23,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type FormErrors = Partial<
-  Record<"name" | "dob" | "relation" | "education" | "job" | "churchGroup", string>
+  Record<"name" | "dob" | "gender" | "relation" | "education" | "job" | "churchGroup", string>
 >;
 
 function isOptionValid(option: OptionWithOther, required: boolean) {
@@ -52,6 +59,7 @@ export function MemberForm({
     const nextErrors: FormErrors = {};
     if (!member.name.trim()) nextErrors.name = "Name is required";
     if (!member.dob) nextErrors.dob = "Date of birth is required";
+    if (!member.gender) nextErrors.gender = "Gender is required";
     if (!isHead && !isOptionValid(member.relation, true)) {
       nextErrors.relation = "Relation with head of family is required";
     }
@@ -100,6 +108,27 @@ export function MemberForm({
               value={member.phone}
               onChange={(event) => setMember((prev) => ({ ...prev, phone: event.target.value }))}
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="member-gender">
+              Gender<span className="ml-0.5 text-destructive">*</span>
+            </Label>
+            <Select
+              value={member.gender}
+              onValueChange={(gender) => setMember((prev) => ({ ...prev, gender }))}
+            >
+              <SelectTrigger id="member-gender">
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.gender ? (
+              <p className="text-xs font-medium text-destructive">{errors.gender}</p>
+            ) : null}
           </div>
 
           <div className="space-y-1.5">

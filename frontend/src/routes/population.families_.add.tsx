@@ -29,7 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 
-export const Route = createFileRoute("/population/families/add")({
+export const Route = createFileRoute("/population/families_/add")({
   component: AddFamilyPage,
 });
 
