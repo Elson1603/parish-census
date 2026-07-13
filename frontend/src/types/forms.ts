@@ -47,7 +47,7 @@ export const memberFormSchema = z.object({
   maritalStatus: z.string().optional().or(z.literal("")),
   education: z.string().optional().or(z.literal("")),
   occupation: z.string().optional().or(z.literal("")),
-  churchGroup: z.string().optional().or(z.literal("")),
+  churchGroup: z.array(z.string()),
   remarks: z.string().optional().or(z.literal("")),
 });
 

@@ -39,7 +39,7 @@ export interface Member {
   firstCommunion: boolean;
   confirmation: boolean;
   churchMarriage: boolean;
-  churchGroup: string;
+  churchGroup: string[];
   relationshipWithHead: string;
   maritalStatus: string;
   specialNeeds?: string;

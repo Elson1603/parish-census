@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import ARRAY, Boolean, Date, DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -50,9 +50,9 @@ class Member(Base):
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
     dob: Mapped[date] = mapped_column(Date, nullable=False)
     photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    # gender/blood_group/mobile/occupation/education/church_group/marital_status default to ""
-    # because the quick census intake flow only collects name/dob/relation/education/job/church
-    # group; the admin "Add Member" form is what fills in the rest.
+    # gender/blood_group/mobile/occupation/education/marital_status default to "" because
+    # the quick census intake flow only collects a subset of fields; the admin "Add Member"
+    # form is what fills in the rest.
     gender: Mapped[str] = mapped_column(String(10), nullable=False, default="")
     blood_group: Mapped[str] = mapped_column(String(10), nullable=False, default="")
     mobile: Mapped[str] = mapped_column(String(20), nullable=False, default="")
@@ -63,7 +63,11 @@ class Member(Base):
     first_communion: Mapped[bool] = mapped_column(Boolean, default=False)
     confirmation: Mapped[bool] = mapped_column(Boolean, default=False)
     church_marriage: Mapped[bool] = mapped_column(Boolean, default=False)
-    church_group: Mapped[str] = mapped_column(String(100), nullable=False, default="")
+    # A member can belong to more than one church group (e.g. Choir + Youth Group),
+    # so this is a Postgres array rather than a single string.
+    church_group: Mapped[list[str]] = mapped_column(
+        ARRAY(String(100)), nullable=False, default=list
+    )
     relationship_with_head: Mapped[str] = mapped_column(String(50), nullable=False, default="")
     marital_status: Mapped[str] = mapped_column(String(50), nullable=False, default="")
     special_needs: Mapped[str | None] = mapped_column(String(100), nullable=True)

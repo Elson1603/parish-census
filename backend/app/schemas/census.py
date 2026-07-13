@@ -80,10 +80,10 @@ class MemberBase(BaseModel):
     gender: Gender
     dob: date
     photo_url: str | None = Field(default=None, alias="photoUrl", max_length=500)
-    # occupation/education/church_group/blood_group used to be master-data-driven
-    # dropdowns; that admin feature was removed, so the admin form no longer
-    # collects them. They stay optional here so an edit that omits them doesn't
-    # wipe out values already set by the census intake flow (see update_member).
+    # occupation/education/blood_group used to be master-data-driven dropdowns; that
+    # admin feature was removed, so the admin form no longer collects them. They stay
+    # optional here so an edit that omits them doesn't wipe out values already set by
+    # the census intake flow (see update_member).
     blood_group: str | None = Field(default=None, alias="bloodGroup", max_length=10)
     # Not required: the Edit Member form mirrors the census intake wizard, which
     # never requires a phone number either.
@@ -95,7 +95,10 @@ class MemberBase(BaseModel):
     first_communion: bool = Field(default=False, alias="firstCommunion")
     confirmation: bool = False
     church_marriage: bool = Field(default=False, alias="churchMarriage")
-    church_group: str | None = Field(default=None, alias="churchGroup", max_length=100)
+    # A member can belong to more than one group, and this is a visible, directly
+    # editable multi-select in every form that collects it - unlike occupation/
+    # education above, an empty list here is a real value, not "field omitted".
+    church_group: list[str] = Field(default_factory=list, alias="churchGroup")
     relationship_with_head: str = Field(alias="relationshipWithHead", min_length=1, max_length=50)
     # Not required: matches the census intake wizard, where marital status is optional.
     marital_status: str = Field(default="", alias="maritalStatus", max_length=50)
@@ -105,7 +108,7 @@ class MemberBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     @field_validator(
-        "photo_url", "email", "occupation", "education", "church_group", "blood_group",
+        "photo_url", "email", "occupation", "education", "blood_group",
         "special_needs", "remarks", mode="before",
     )
     @classmethod
@@ -139,7 +142,7 @@ class Member(BaseModel):
     first_communion: bool = Field(serialization_alias="firstCommunion")
     confirmation: bool
     church_marriage: bool = Field(serialization_alias="churchMarriage")
-    church_group: str = Field(serialization_alias="churchGroup")
+    church_group: list[str] = Field(serialization_alias="churchGroup")
     relationship_with_head: str = Field(serialization_alias="relationshipWithHead")
     marital_status: str = Field(serialization_alias="maritalStatus")
     special_needs: str | None = Field(default=None, serialization_alias="specialNeeds")
@@ -250,7 +253,7 @@ class CensusMemberIntake(BaseModel):
     relation: str
     education: str | None = None
     job: str | None = None
-    church_group: str | None = Field(default=None, alias="churchGroup")
+    church_group: list[str] = Field(default_factory=list, alias="churchGroup")
     special_remark: str | None = Field(default=None, alias="specialRemark")
 
     model_config = ConfigDict(populate_by_name=True)

@@ -17,6 +17,7 @@ import {
 import { calculateAge, parseIsoDate, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { SelectWithOther } from "@/components/census/select-with-other";
+import { MultiSelectWithOther } from "@/components/census/multi-select-with-other";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -67,8 +68,6 @@ export function MemberForm({
     if (!isOptionValid(member.education, false))
       nextErrors.education = "Please specify the education";
     if (!isOptionValid(member.job, false)) nextErrors.job = "Please specify the job";
-    if (!isOptionValid(member.churchGroup, false))
-      nextErrors.churchGroup = "Please specify the church group";
 
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
@@ -229,7 +228,7 @@ export function MemberForm({
             error={errors.job}
           />
 
-          <SelectWithOther
+          <MultiSelectWithOther
             id="member-church-group"
             label="Church Group"
             options={CHURCH_GROUP_OPTIONS}

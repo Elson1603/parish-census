@@ -62,6 +62,8 @@ export const CHURCH_GROUP_OPTIONS = [
   "Property Committee",
   "Altar Service Group",
   "Ordinary Ministers (Communion)",
+  "Kutumb Seva Samiti",
+  "League of Sacred Heart",
 ];
 
 export const MARITAL_STATUS_OPTIONS = ["Married", "Unmarried"];

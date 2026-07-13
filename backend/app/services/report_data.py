@@ -216,7 +216,7 @@ async def _member_report(db: AsyncSession, title: str, description: str) -> Repo
                     _row_get(row, "mobile") or "",
                     _row_get(row, "occupation") or "",
                     _row_get(row, "education") or "",
-                    _row_get(row, "church_group") or "",
+                    ", ".join(_row_get(row, "church_group")),
                     _row_get(row, "marital_status") or "",
                     _row_get(row, "relationship_with_head") or "",
                 ]
@@ -387,17 +387,20 @@ async def _church_group_report(db: AsyncSession, title: str, description: str) -
     counts: dict[str, int] = {}
     detail_rows = []
     for row in rows:
-        group = _row_get(row, "church_group") or "Not specified"
-        counts[group] = counts.get(group, 0) + 1
-        detail_rows.append(
-            [
-                _row_get(row, "full_name"),
-                _row_get(row, "village_name"),
-                group,
-                str(_row_get(row, "age")),
-                _row_get(row, "gender") or "",
-            ]
-        )
+        # A member can belong to multiple groups, so they contribute one count (and
+        # one detail row) per group rather than a single row for the whole member.
+        groups = _row_get(row, "church_group") or ["Not specified"]
+        for group in groups:
+            counts[group] = counts.get(group, 0) + 1
+            detail_rows.append(
+                [
+                    _row_get(row, "full_name"),
+                    _row_get(row, "village_name"),
+                    group,
+                    str(_row_get(row, "age")),
+                    _row_get(row, "gender") or "",
+                ]
+            )
 
     return ReportData(
         report_type="church-group",

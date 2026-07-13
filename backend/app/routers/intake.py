@@ -44,7 +44,7 @@ async def submit_family_census(payload: schemas.CensusFamilyIntake, db: AsyncSes
                 mobile=member_input.phone or "",
                 occupation=member_input.job or "",
                 education=member_input.education or "",
-                church_group=member_input.church_group or "",
+                church_group=member_input.church_group,
                 relationship_with_head="Head" if index == 0 else member_input.relation,
                 remarks=member_input.special_remark,
             )

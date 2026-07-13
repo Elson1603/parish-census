@@ -16,12 +16,24 @@ export const Route = createFileRoute("/population/villages_/$villageId")({
 // Counts non-blank values for a field, sorted most-common first - used for the
 // Education/Job/Church Group breakdowns, which are open-ended (unlike Gender
 // or Marital Status) so we can't rely on a fixed set of buckets.
-function countByField(members: Member[], key: "education" | "occupation" | "churchGroup") {
+function countByField(members: Member[], key: "education" | "occupation") {
   const counts: Record<string, number> = {};
   for (const member of members) {
     const value = member[key];
     if (!value) continue;
     counts[value] = (counts[value] ?? 0) + 1;
+  }
+  return Object.entries(counts).sort(([, a], [, b]) => b - a);
+}
+
+// Church group is multi-value (a member can belong to more than one group), so
+// each of a member's groups contributes its own count instead of one-per-member.
+function countByChurchGroup(members: Member[]) {
+  const counts: Record<string, number> = {};
+  for (const member of members) {
+    for (const group of member.churchGroup) {
+      counts[group] = (counts[group] ?? 0) + 1;
+    }
   }
   return Object.entries(counts).sort(([, a], [, b]) => b - a);
 }
@@ -64,7 +76,7 @@ function VillageDetailPage() {
 
   const educationCounts = useMemo(() => countByField(members, "education"), [members]);
   const occupationCounts = useMemo(() => countByField(members, "occupation"), [members]);
-  const churchGroupCounts = useMemo(() => countByField(members, "churchGroup"), [members]);
+  const churchGroupCounts = useMemo(() => countByChurchGroup(members), [members]);
 
   if (villagesQuery.isLoading || familiesQuery.isLoading || membersQuery.isLoading)
     return <LoadingSpinner label="Loading village details..." />;

@@ -28,7 +28,7 @@ export function MemberSummaryList({
           : resolveOptionLabel(member.relation) || "Relation not set";
         const education = resolveOptionLabel(member.education);
         const job = resolveOptionLabel(member.job);
-        const churchGroup = resolveOptionLabel(member.churchGroup);
+        const churchGroups = member.churchGroup;
 
         return (
           <li key={member.id} className="rounded-lg border border-border bg-background/70 p-3.5">
@@ -44,11 +44,13 @@ export function MemberSummaryList({
                     : "DOB not set"}
                   {member.phone ? ` · ${member.phone}` : ""}
                 </p>
-                {education || job || churchGroup ? (
+                {education || job || churchGroups.length > 0 ? (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {education ? <MetaBadge label={education} /> : null}
                     {job ? <MetaBadge label={job} /> : null}
-                    {churchGroup ? <MetaBadge label={churchGroup} /> : null}
+                    {churchGroups.map((group) => (
+                      <MetaBadge key={group} label={group} />
+                    ))}
                   </div>
                 ) : null}
                 {member.specialRemark ? (

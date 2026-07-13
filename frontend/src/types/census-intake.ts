@@ -16,7 +16,7 @@ export interface CensusMemberInput {
   relation: OptionWithOther;
   education: OptionWithOther;
   job: OptionWithOther;
-  churchGroup: OptionWithOther;
+  churchGroup: string[];
   specialRemark: string;
 }
 
@@ -47,7 +47,7 @@ export function createEmptyMember(isHead: boolean): CensusMemberInput {
     relation: createEmptyOption(),
     education: createEmptyOption(),
     job: createEmptyOption(),
-    churchGroup: createEmptyOption(),
+    churchGroup: [],
     specialRemark: "",
   };
 }

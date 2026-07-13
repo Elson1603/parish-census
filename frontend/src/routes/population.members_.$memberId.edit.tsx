@@ -21,6 +21,7 @@ import { memberFormSchema, type MemberFormValues } from "@/types/forms";
 import { calculateAge, parseIsoDate, toIsoDate } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { SelectWithOther } from "@/components/census/select-with-other";
+import { MultiSelectWithOther } from "@/components/census/multi-select-with-other";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -87,7 +88,7 @@ function EditMemberPage() {
       maritalStatus: "",
       education: "",
       occupation: "",
-      churchGroup: "",
+      churchGroup: [],
       remarks: "",
     },
   });
@@ -353,12 +354,12 @@ function EditMemberPage() {
               control={form.control}
               name="churchGroup"
               render={({ field }) => (
-                <SelectWithOther
+                <MultiSelectWithOther
                   id="edit-church-group"
                   label="Church Group"
                   options={CHURCH_GROUP_OPTIONS}
-                  value={toOption(field.value ?? "", CHURCH_GROUP_OPTIONS)}
-                  onChange={(option) => field.onChange(resolveOptionLabel(option))}
+                  value={field.value ?? []}
+                  onChange={field.onChange}
                   placeholder="Select church group"
                 />
               )}

@@ -37,7 +37,7 @@ function buildFamilyPayload(family: CensusFamilyInput) {
       relation: member.isHead ? "Head of Family" : resolveOptionLabel(member.relation),
       education: resolveOptionLabel(member.education) || undefined,
       job: resolveOptionLabel(member.job) || undefined,
-      churchGroup: resolveOptionLabel(member.churchGroup) || undefined,
+      churchGroup: member.churchGroup,
       specialRemark: member.specialRemark || undefined,
     })),
   };
