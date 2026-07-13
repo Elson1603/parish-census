@@ -2,22 +2,17 @@ import { z } from "zod";
 
 const mobileRegex = /^[6-9]\d{9}$/;
 
+// Mirrors the census intake wizard's family-level fields exactly: village +
+// head-of-family name + an optional phone number. Alternate mobile/email/
+// address/remarks aren't collected there, so they're left out of this form too.
 export const familyFormSchema = z.object({
   villageId: z.string().min(1, "Village is required"),
   headOfFamily: z.string().min(2, "Head of family is required"),
-  primaryMobile: z.string().regex(mobileRegex, "Enter a valid 10-digit mobile number"),
-  alternateMobile: z
+  primaryMobile: z
     .string()
     .optional()
     .or(z.literal(""))
-    .refine((value) => !value || mobileRegex.test(value), "Alternate mobile is invalid"),
-  email: z
-    .string()
-    .optional()
-    .or(z.literal(""))
-    .refine((value) => !value || z.string().email().safeParse(value).success, "Invalid email"),
-  address: z.string().min(5, "Address is required"),
-  remarks: z.string().optional().or(z.literal("")),
+    .refine((value) => !value || mobileRegex.test(value), "Enter a valid 10-digit mobile number"),
 });
 
 export type FamilyFormValues = z.infer<typeof familyFormSchema>;

@@ -20,11 +20,15 @@ export const VILLAGE_OPTIONS = [
 ];
 
 export const RELATION_OPTIONS = [
+  "Wife",
+  "Husband",
   "Mother",
   "Father",
   "Son",
   "Daughter",
   "Daughter in law",
+  "Brother",
+  "Sister",
   "Grandson",
   "Granddaughter",
   "Grandmother",

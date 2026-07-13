@@ -34,13 +34,20 @@ class Village(VillageBase):
 class FamilyBase(BaseModel):
     village_id: str = Field(alias="villageId")
     head_of_family: str = Field(alias="headOfFamily", min_length=2, max_length=200)
-    contact_number: str = Field(alias="contactNumber", min_length=1, max_length=20)
+    # Not required: the Add Family form mirrors the census intake wizard, which
+    # only collects village + head-of-family name + an optional phone number.
+    contact_number: str = Field(default="", alias="contactNumber", max_length=20)
     alternate_number: str | None = Field(default=None, alias="alternateNumber", max_length=20)
     email: str | None = Field(default=None, max_length=200)
-    address: str = Field(min_length=5)
+    address: str = Field(default="")
     remarks: str | None = None
 
     model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator("contact_number", "address", mode="before")
+    @classmethod
+    def _blank_to_empty(cls, value: str | None) -> str:
+        return _blank_to_none(value) or ""
 
     @field_validator("alternate_number", "email", "remarks", mode="before")
     @classmethod

@@ -25,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 
@@ -42,10 +41,6 @@ function AddFamilyPage() {
       villageId: "",
       headOfFamily: "",
       primaryMobile: "",
-      alternateMobile: "",
-      email: "",
-      address: "",
-      remarks: "",
     },
   });
 
@@ -72,10 +67,6 @@ function AddFamilyPage() {
       villageId: values.villageId,
       headOfFamily: values.headOfFamily,
       contactNumber: values.primaryMobile,
-      alternateNumber: values.alternateMobile,
-      email: values.email,
-      address: values.address,
-      remarks: values.remarks,
     });
     toast.success("Family saved successfully");
     form.reset();
@@ -143,71 +134,15 @@ function AddFamilyPage() {
               name="primaryMobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary Mobile</FormLabel>
+                  <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="10-digit mobile" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="alternateMobile"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Alternate Mobile</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Optional" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="family@example.com" {...field} />
+                    <Input placeholder="10-digit mobile number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address</FormLabel>
-                <FormControl>
-                  <Textarea rows={3} placeholder="Street, area, village" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="remarks"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Remarks</FormLabel>
-                <FormControl>
-                  <Textarea rows={2} placeholder="Optional notes" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="flex flex-wrap justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => form.reset()}>
