@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/auth-context";
 import { AppShell } from "@/layouts/app-shell";
 
 function NotFoundComponent() {
@@ -147,10 +148,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </AppShell>
+      <AuthProvider>
+        <AppShell>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </AppShell>
+      </AuthProvider>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );

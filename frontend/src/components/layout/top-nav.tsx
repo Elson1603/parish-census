@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Moon, Search, Sun } from "lucide-react";
+import { LogOut, Moon, Search, Sun } from "lucide-react";
 import { getGlobalSearchSuggestions } from "@/services/census.service";
+import { useAuth } from "@/context/auth-context";
 import { useThemeMode } from "@/context/theme-context";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 export function TopNav() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeMode();
+  const { logout } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -60,7 +69,7 @@ export function TopNav() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
         <SidebarTrigger className="shrink-0" />
 
         <Button
@@ -81,6 +90,20 @@ export function TopNav() {
           variant="outline"
           size="icon"
           className="shrink-0 rounded-full bg-background/70"
+          onClick={() => {
+            logout();
+            void navigate({ to: "/" });
+          }}
+          aria-label="Logout"
+        >
+          <LogOut className="size-4" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="shrink-0 rounded-full bg-background/70"
           onClick={toggleTheme}
           aria-label="Toggle theme"
         >
@@ -89,9 +112,15 @@ export function TopNav() {
       </header>
 
       <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <CommandInput value={query} onValueChange={setQuery} placeholder="Search village, family, member..." />
+        <CommandInput
+          value={query}
+          onValueChange={setQuery}
+          placeholder="Search village, family, member..."
+        />
         <CommandList>
-          {!isFetching && query.trim().length > 1 ? <CommandEmpty>No matches found.</CommandEmpty> : null}
+          {!isFetching && query.trim().length > 1 ? (
+            <CommandEmpty>No matches found.</CommandEmpty>
+          ) : null}
 
           {grouped.village.length > 0 ? (
             <CommandGroup heading="Villages">

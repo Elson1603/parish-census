@@ -21,6 +21,7 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (router) => router.location.pathname });
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const adminNavSections = navSections.filter((section) => section.to !== "/");
 
   return (
     <Sidebar collapsible="icon">
@@ -47,9 +48,10 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navSections.map((section) => {
+              {adminNavSections.map((section) => {
                 const isSectionActive =
-                  pathname === section.to || (section.children?.some((item) => pathname.startsWith(item.to)) ?? false);
+                  pathname === section.to ||
+                  (section.children?.some((item) => pathname.startsWith(item.to)) ?? false);
 
                 return (
                   <SidebarMenuItem key={section.title}>
