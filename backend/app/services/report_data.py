@@ -140,19 +140,47 @@ async def _village_population_report(db: AsyncSession, title: str, description: 
         )
     ).all()
 
+    detail_rows = [
+        [name, str(families), str(members), str(male), str(female)]
+        for name, families, members, male, female in rows
+    ]
+    numeric_rows = [
+        (name, int(families or 0), int(members or 0), int(male or 0), int(female or 0))
+        for name, families, members, male, female in rows
+    ]
+
+    def top_village(metric_index: int) -> tuple[str, int]:
+        if not numeric_rows:
+            return ("No village", 0)
+        name, *counts = sorted(
+            numeric_rows,
+            key=lambda row: (-row[metric_index], row[0]),
+        )[0]
+        return (name, counts[metric_index - 1])
+
+    most_families = top_village(1)
+    most_members = top_village(2)
+    most_male = top_village(3)
+    most_female = top_village(4)
+
     table = ReportTable(
         headers=["Village", "Families", "Members", "Male", "Female"],
-        rows=[
-            [name, str(families), str(members), str(male), str(female)]
-            for name, families, members, male, female in rows
-        ],
+        rows=detail_rows,
     )
     return ReportData(
         report_type="village-population",
         title=title,
         description=description,
         detail=table,
-        summary=table,
+        summary=ReportTable(
+            headers=["Summary", "Village", "Count"],
+            rows=[
+                ["Most Families", most_families[0], str(most_families[1])],
+                ["Most Members", most_members[0], str(most_members[1])],
+                ["Most Male Members", most_male[0], str(most_male[1])],
+                ["Most Female Members", most_female[0], str(most_female[1])],
+            ],
+        ),
     )
 
 

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect } from "react";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { ThemeProvider } from "@/context/theme-context";
 import { useAuth } from "@/context/auth-context";
@@ -21,16 +20,9 @@ function isAdminRoute(pathname: string) {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const navigate = useNavigate();
   const pathname = useRouterState({ select: (router) => router.location.pathname });
   const { isReady, role, logout } = useAuth();
   const adminRoute = isAdminRoute(pathname);
-
-  useEffect(() => {
-    if (isReady && role === "admin" && pathname === "/") {
-      void navigate({ to: "/dashboard", replace: true });
-    }
-  }, [isReady, navigate, pathname, role]);
 
   return (
     <ThemeProvider>
@@ -47,9 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ) : role === "user" ? (
         <UserShell onLogout={logout}>{children}</UserShell>
       ) : role === "admin" ? (
-        <div className="flex min-h-screen items-center justify-center bg-background px-4 text-sm text-muted-foreground">
-          Opening admin dashboard...
-        </div>
+        <AdminShell>{children}</AdminShell>
       ) : (
         <LoginScreen role="user" />
       )}
