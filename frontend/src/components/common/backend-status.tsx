@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/services/http";
 
+const BACKEND_KEEP_ALIVE_INTERVAL_MS = 5 * 60 * 1000;
+
 async function checkBackendHealth() {
   await apiClient.get("/health");
   return true;
@@ -10,7 +12,8 @@ export function BackendStatus() {
   const query = useQuery({
     queryKey: ["backend-health"],
     queryFn: checkBackendHealth,
-    refetchInterval: 10000,
+    refetchInterval: BACKEND_KEEP_ALIVE_INTERVAL_MS,
+    refetchIntervalInBackground: true,
     retry: false,
   });
 
