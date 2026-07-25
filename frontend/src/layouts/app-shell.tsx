@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/context/theme-context";
 import { useAuth } from "@/context/auth-context";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { TopNav } from "@/components/layout/top-nav";
+import { BackendStatus } from "@/components/common/backend-status";
 import { LoginScreen } from "@/components/common/login-screen";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -78,10 +79,13 @@ function UserShell({ children, onLogout }: { children: ReactNode; onLogout: () =
             </p>
             <p className="truncate text-xs text-muted-foreground">Parish Census Data Entry</p>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={onLogout}>
-            <LogOut className="size-4" />
-            Logout
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <BackendStatus />
+            <Button type="button" variant="outline" size="sm" onClick={onLogout}>
+              <LogOut className="size-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 

@@ -11,6 +11,7 @@ import { LogOut, Moon, Search, Sun } from "lucide-react";
 import { getGlobalSearchSuggestions } from "@/services/census.service";
 import { useAuth } from "@/context/auth-context";
 import { useThemeMode } from "@/context/theme-context";
+import { BackendStatus } from "@/components/common/backend-status";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -84,7 +85,7 @@ export function TopNav() {
   };
 
   return (
-    <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
       <SidebarTrigger className="shrink-0" />
 
       <div className="relative w-full max-w-xl">
@@ -122,6 +123,8 @@ export function TopNav() {
           </div>
         ) : null}
       </div>
+
+      <BackendStatus />
 
       <Button
         type="button"

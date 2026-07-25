@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Church, LockKeyhole } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
+import { BackendStatus } from "@/components/common/backend-status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,9 @@ export function LoginScreen({ role }: LoginScreenProps) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <div className="absolute left-4 top-4">
+        <BackendStatus />
+      </div>
       <Card className="panel-surface w-full max-w-md rounded-xl">
         <CardHeader className="items-center text-center">
           <span className="parish-gradient grid size-14 place-items-center rounded-full text-primary-foreground shadow-lg">
