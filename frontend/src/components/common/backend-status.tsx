@@ -3,6 +3,7 @@ import { apiClient } from "@/services/http";
 
 async function checkBackendHealth() {
   await apiClient.get("/health");
+  return true;
 }
 
 export function BackendStatus() {
