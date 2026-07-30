@@ -233,9 +233,47 @@ function DashboardPage() {
           </CardContent>
         </Card>
 
+        <Card className="panel-surface">
+          <CardHeader>
+            <CardTitle>Marital Status Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {maritalStatusDistribution.length === 0 ? (
+              <p className="py-16 text-center text-sm text-muted-foreground">
+                No marital status recorded yet.
+              </p>
+            ) : (
+              <ChartContainer
+                className="h-[180px] w-full"
+                config={Object.fromEntries(
+                  maritalStatusDistribution.map((entry) => [
+                    entry.name,
+                    { label: entry.name, color: maritalStatusColor(entry.name) },
+                  ]),
+                )}
+              >
+                <PieChart>
+                  <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                  <Pie
+                    data={maritalStatusDistribution}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={38}
+                    outerRadius={64}
+                  >
+                    {maritalStatusDistribution.map((entry) => (
+                      <Cell key={entry.name} fill={maritalStatusColor(entry.name)} />
+                    ))}
+                  </Pie>
+                  <ChartLegend content={<ChartLegendContent nameKey="name" />} />
+                </PieChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <Card className="panel-surface xl:col-span-2">
           <CardHeader>
             <CardTitle>Occupation Distribution</CardTitle>
@@ -265,45 +303,6 @@ function DashboardPage() {
                 />
               </BarChart>
             </ChartContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="panel-surface">
-          <CardHeader>
-            <CardTitle>Marital Status Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {maritalStatusDistribution.length === 0 ? (
-              <p className="py-16 text-center text-sm text-muted-foreground">
-                No marital status recorded yet.
-              </p>
-            ) : (
-              <ChartContainer
-                className="h-[260px] w-full"
-                config={Object.fromEntries(
-                  maritalStatusDistribution.map((entry) => [
-                    entry.name,
-                    { label: entry.name, color: maritalStatusColor(entry.name) },
-                  ]),
-                )}
-              >
-                <PieChart>
-                  <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                  <Pie
-                    data={maritalStatusDistribution}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={38}
-                    outerRadius={64}
-                  >
-                    {maritalStatusDistribution.map((entry) => (
-                      <Cell key={entry.name} fill={maritalStatusColor(entry.name)} />
-                    ))}
-                  </Pie>
-                  <ChartLegend content={<ChartLegendContent nameKey="name" />} />
-                </PieChart>
-              </ChartContainer>
-            )}
           </CardContent>
         </Card>
 
