@@ -202,7 +202,7 @@ class DashboardData(BaseModel):
         serialization_alias="maritalStatusDistribution"
     )
     occupation_distribution: list[ChartDatum] = Field(serialization_alias="occupationDistribution")
-    age_distribution: list[ChartDatum] = Field(serialization_alias="ageDistribution")
+    education_distribution: list[ChartDatum] = Field(serialization_alias="educationDistribution")
     recent_families: list[Family] = Field(serialization_alias="recentFamilies")
     recent_members: list[Member] = Field(serialization_alias="recentMembers")
     timeline: list[ActivityItem]

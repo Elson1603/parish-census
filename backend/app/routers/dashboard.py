@@ -109,6 +109,19 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         schemas.ChartDatum(name=name, value=value) for name, value in occupation_rows
     ]
 
+    education_rows = (
+        await db.execute(
+            select(Member.education, func.count(Member.id))
+            .where(Member.education != "")
+            .group_by(Member.education)
+            .order_by(func.count(Member.id).desc())
+            .limit(8)
+        )
+    ).all()
+    education_distribution = [
+        schemas.ChartDatum(name=name, value=value) for name, value in education_rows
+    ]
+
     marital_status_rows = (
         await db.execute(
             select(Member.marital_status, func.count(Member.id))
@@ -196,7 +209,7 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         gender_distribution=gender_distribution,
         marital_status_distribution=marital_status_distribution,
         occupation_distribution=occupation_distribution,
-        age_distribution=age_distribution,
+        education_distribution=education_distribution,
         recent_families=recent_families,
         recent_members=recent_members,
         timeline=timeline_events[:5],

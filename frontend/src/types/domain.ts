@@ -83,7 +83,7 @@ export interface DashboardData {
   genderDistribution: ChartDatum[];
   maritalStatusDistribution: ChartDatum[];
   occupationDistribution: ChartDatum[];
-  ageDistribution: ChartDatum[];
+  educationDistribution: ChartDatum[];
   recentFamilies: Family[];
   recentMembers: Member[];
   timeline: ActivityItem[];
