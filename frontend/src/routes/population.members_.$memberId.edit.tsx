@@ -55,6 +55,35 @@ function cleanText(value: string | null | undefined): string {
   return (value ?? "").trim();
 }
 
+function readText(source: Record<string, unknown>, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "string") return cleanText(value);
+    if (value != null) return cleanText(String(value));
+  }
+  return "";
+}
+
+function readBoolean(source: Record<string, unknown>, ...keys: string[]): boolean {
+  for (const key of keys) {
+    const value = source[key];
+    if (typeof value === "boolean") return value;
+  }
+  return false;
+}
+
+function readStringArray(source: Record<string, unknown>, ...keys: string[]): string[] {
+  for (const key of keys) {
+    const value = source[key];
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => (typeof item === "string" ? cleanText(item) : cleanText(String(item))))
+        .filter(Boolean);
+    }
+  }
+  return [];
+}
+
 function matchOption(value: string | null | undefined, options: readonly string[]): string {
   const cleaned = cleanText(value);
   if (!cleaned) return "";
@@ -117,32 +146,43 @@ function EditMemberPage() {
   });
   React.useEffect(() => {
     if (!member) return;
+    const memberRecord = member as unknown as Record<string, unknown>;
+    const education = readText(memberRecord, "education");
+    const occupation = readText(memberRecord, "occupation", "job");
     // villageId/familyId/email/photoUrl/sacraments aren't shown in this form
     // (it mirrors the census intake wizard's fields only), but are carried
     // through unchanged so saving doesn't wipe out data set elsewhere.
     form.reset({
-      fullName: cleanText(member.fullName),
-      gender: matchOption(member.gender, GENDER_OPTIONS),
-      dob: member.dob,
-      age: member.age,
-      photoUrl: member.photoUrl ?? "",
-      mobile: cleanText(member.mobile),
-      email: cleanText(member.email),
-      baptized: member.baptized,
-      firstCommunion: member.firstCommunion,
-      confirmation: member.confirmation,
-      churchMarriage: member.churchMarriage,
-      villageId: member.villageId,
-      familyId: member.familyId,
-      relationshipWithHead: cleanText(member.relationshipWithHead),
-      maritalStatus: matchOption(member.maritalStatus, MARITAL_STATUS_OPTIONS),
-      education: cleanText(member.education),
-      occupation: cleanText(member.occupation),
-      churchGroup: member.churchGroup,
-      remarks: cleanText(member.remarks),
+      fullName: readText(memberRecord, "fullName", "full_name"),
+      gender: matchOption(readText(memberRecord, "gender"), GENDER_OPTIONS),
+      dob: readText(memberRecord, "dob"),
+      age: Number(memberRecord.age ?? 0),
+      photoUrl: readText(memberRecord, "photoUrl", "photo_url"),
+      mobile: readText(memberRecord, "mobile", "phone"),
+      email: readText(memberRecord, "email"),
+      baptized: readBoolean(memberRecord, "baptized"),
+      firstCommunion: readBoolean(memberRecord, "firstCommunion", "first_communion"),
+      confirmation: readBoolean(memberRecord, "confirmation"),
+      churchMarriage: readBoolean(memberRecord, "churchMarriage", "church_marriage"),
+      villageId: readText(memberRecord, "villageId", "village_id"),
+      familyId: readText(memberRecord, "familyId", "family_id"),
+      relationshipWithHead: readText(
+        memberRecord,
+        "relationshipWithHead",
+        "relationship_with_head",
+        "relation",
+      ),
+      maritalStatus: matchOption(
+        readText(memberRecord, "maritalStatus", "marital_status"),
+        MARITAL_STATUS_OPTIONS,
+      ),
+      education,
+      occupation,
+      churchGroup: readStringArray(memberRecord, "churchGroup", "church_group"),
+      remarks: readText(memberRecord, "remarks", "specialRemark", "special_remark"),
     });
-    setEducationChoice(toOption(member.education, EDUCATION_OPTIONS));
-    setOccupationChoice(toOption(member.occupation, JOB_OPTIONS));
+    setEducationChoice(toOption(education, EDUCATION_OPTIONS));
+    setOccupationChoice(toOption(occupation, JOB_OPTIONS));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member]);
 
@@ -234,7 +274,8 @@ function EditMemberPage() {
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
-                        {field.value && !GENDER_OPTIONS.includes(field.value as (typeof GENDER_OPTIONS)[number]) ? (
+                        {field.value &&
+                        !GENDER_OPTIONS.includes(field.value as (typeof GENDER_OPTIONS)[number]) ? (
                           <SelectItem value={field.value}>{field.value}</SelectItem>
                         ) : null}
                         <SelectItem value="Male">Male</SelectItem>
@@ -357,7 +398,11 @@ function EditMemberPage() {
                   id="edit-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
-                  value={educationChoice.value ? educationChoice : toOption(field.value ?? "", EDUCATION_OPTIONS)}
+                  value={
+                    educationChoice.value
+                      ? educationChoice
+                      : toOption(field.value ?? "", EDUCATION_OPTIONS)
+                  }
                   onChange={(option) => {
                     setEducationChoice(option);
                     field.onChange(resolveOptionLabel(option));
@@ -375,7 +420,11 @@ function EditMemberPage() {
                   id="edit-job"
                   label="Job"
                   options={JOB_OPTIONS}
-                  value={occupationChoice.value ? occupationChoice : toOption(field.value ?? "", JOB_OPTIONS)}
+                  value={
+                    occupationChoice.value
+                      ? occupationChoice
+                      : toOption(field.value ?? "", JOB_OPTIONS)
+                  }
                   onChange={(option) => {
                     setOccupationChoice(option);
                     field.onChange(resolveOptionLabel(option));
