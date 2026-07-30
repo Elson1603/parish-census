@@ -404,6 +404,8 @@ function EditMemberPage() {
                   id="edit-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
+                  allowEmptyOption
+                  emptyOptionLabel="None"
                   value={
                     educationChoice.value
                       ? educationChoice
@@ -426,6 +428,8 @@ function EditMemberPage() {
                   id="edit-job"
                   label="Job"
                   options={JOB_OPTIONS}
+                  allowEmptyOption
+                  emptyOptionLabel="None"
                   value={
                     occupationChoice.value
                       ? occupationChoice
