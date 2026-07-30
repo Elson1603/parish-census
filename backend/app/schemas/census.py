@@ -87,10 +87,10 @@ class MemberBase(BaseModel):
     gender: Gender
     dob: date
     photo_url: str | None = Field(default=None, alias="photoUrl", max_length=500)
-    # occupation/education/blood_group used to be master-data-driven dropdowns; that
-    # admin feature was removed, so the admin form no longer collects them. They stay
-    # optional here so an edit that omits them doesn't wipe out values already set by
-    # the census intake flow (see update_member).
+    # occupation/education/blood_group used to be master-data-driven dropdowns; the
+    # edit form can still leave them blank without wiping out the rest of the member.
+    # Occupation and education now intentionally accept blank strings so the admin UI
+    # can clear those fields; blood_group/special_needs still preserve omission.
     blood_group: str | None = Field(default=None, alias="bloodGroup", max_length=10)
     # Not required: the Edit Member form mirrors the census intake wizard, which
     # never requires a phone number either.
@@ -115,7 +115,7 @@ class MemberBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     @field_validator(
-        "photo_url", "email", "occupation", "education", "blood_group",
+        "photo_url", "email", "blood_group",
         "special_needs", "remarks", mode="before",
     )
     @classmethod

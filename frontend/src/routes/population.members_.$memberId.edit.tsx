@@ -414,6 +414,7 @@ function EditMemberPage() {
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select education"
+                  allowClear
                 />
               )}
             />
@@ -436,6 +437,7 @@ function EditMemberPage() {
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select job"
+                  allowClear
                 />
               )}
             />

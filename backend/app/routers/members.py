@@ -128,10 +128,9 @@ async def update_member(member_id: str, payload: schemas.MemberCreate, db: Async
     member.marital_status = payload.marital_status
     member.remarks = payload.remarks
 
-    # occupation/education/blood_group/special_needs no longer have form controls in
-    # the admin Add/Edit Member UI (master data was removed), so a payload that omits
-    # them (None) must leave the existing value untouched - not overwrite data a
-    # member already has from the census intake flow.
+    # occupation/education can now be explicitly cleared from the edit form, so a
+    # non-None payload value should always be written back. blood_group/special_needs
+    # still preserve omission when the admin UI does not send them.
     if payload.occupation is not None:
         member.occupation = payload.occupation
     if payload.education is not None:

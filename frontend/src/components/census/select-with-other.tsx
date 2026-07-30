@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const CLEAR_VALUE = "__clear__";
+
 export function SelectWithOther({
   id,
   label,
@@ -18,6 +20,8 @@ export function SelectWithOther({
   onChange,
   placeholder = "Select an option",
   required = false,
+  allowClear = false,
+  clearLabel = "None",
   error,
 }: {
   id: string;
@@ -27,9 +31,12 @@ export function SelectWithOther({
   onChange: (value: OptionWithOther) => void;
   placeholder?: string;
   required?: boolean;
+  allowClear?: boolean;
+  clearLabel?: string;
   error?: string;
 }) {
   const isOther = value.value === OTHER_VALUE;
+  const selectValue = value.value || (allowClear ? CLEAR_VALUE : "");
 
   return (
     <div className="space-y-1.5">
@@ -39,15 +46,19 @@ export function SelectWithOther({
       </Label>
 
       <Select
-        value={value.value}
+        value={selectValue}
         onValueChange={(next) =>
-          onChange({ value: next, otherValue: next === OTHER_VALUE ? value.otherValue : "" })
+          onChange({
+            value: next === CLEAR_VALUE ? "" : next,
+            otherValue: next === OTHER_VALUE ? value.otherValue : "",
+          })
         }
       >
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
+          {allowClear ? <SelectItem value={CLEAR_VALUE}>{clearLabel}</SelectItem> : null}
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {option}
