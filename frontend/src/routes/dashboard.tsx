@@ -317,13 +317,19 @@ function DashboardPage() {
                 members: { label: "Members", color: "var(--color-chart-5)" },
               }}
             >
-              <BarChart data={educationDistribution}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis
+              <BarChart
+                data={educationDistribution}
+                layout="vertical"
+                margin={{ left: 24 }}
+              >
+                <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+                <XAxis type="number" tickLine={false} axisLine={false} />
+                <YAxis
+                  type="category"
                   dataKey="name"
                   tickLine={false}
                   axisLine={false}
-                  interval={0}
+                  width={160}
                   tick={{ fontSize: 11 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
@@ -331,7 +337,7 @@ function DashboardPage() {
                   dataKey="value"
                   name="members"
                   fill="var(--color-members)"
-                  radius={[6, 6, 0, 0]}
+                  radius={[0, 6, 6, 0]}
                 />
               </BarChart>
             </ChartContainer>
