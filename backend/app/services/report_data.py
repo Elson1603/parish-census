@@ -256,27 +256,28 @@ async def _member_report(db: AsyncSession, title: str, description: str) -> Repo
 
 async def _age_report(db: AsyncSession, title: str, description: str) -> ReportData:
     rows = await _member_rows(db)
-    buckets = {"0-12": 0, "13-25": 0, "26-59": 0, "60+": 0}
+    buckets = {"0-15": 0, "16-30 Unmarried": 0, "Adults": 0, "60+": 0}
 
-    def bucket_for(age: int) -> str:
-        if age <= 12:
-            return "0-12"
-        if age <= 25:
-            return "13-25"
+    def bucket_for(age: int, marital_status: str) -> str:
+        if age <= 15:
+            return "0-15"
+        if 16 <= age <= 30 and marital_status.lower() == "unmarried":
+            return "16-30 Unmarried"
         if age < 60:
-            return "26-59"
+            return "Adults"
         return "60+"
 
     detail_rows = []
     for row in rows:
         age = _row_get(row, "age")
-        buckets[bucket_for(age)] += 1
+        age_group = bucket_for(age, _row_get(row, "marital_status") or "")
+        buckets[age_group] += 1
         detail_rows.append(
             [
                 _row_get(row, "full_name"),
                 _row_get(row, "village_name"),
                 str(age),
-                bucket_for(age),
+                age_group,
                 _row_get(row, "gender") or "",
             ]
         )
@@ -474,8 +475,16 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
             select(
                 func.count(case((Member.gender == "Male", 1))).label("male"),
                 func.count(case((Member.gender == "Female", 1))).label("female"),
-                func.count(case((age <= 12, 1))).label("children"),
-                func.count(case((age.between(13, 25), 1))).label("youth"),
+                func.count(case((age <= 15, 1))).label("children"),
+                func.count(
+                    case(
+                        (
+                            age.between(16, 30)
+                            & (func.lower(Member.marital_status) == "unmarried"),
+                            1,
+                        )
+                    )
+                ).label("youth"),
                 func.count(case((age >= 60, 1))).label("seniors"),
             )
         )
@@ -520,9 +529,9 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
             ["Total Members", str(total_members)],
             ["Male Members", str(stats_row.male)],
             ["Female Members", str(stats_row.female)],
-            ["Children (0-12)", str(stats_row.children)],
-            ["Youth (13-25)", str(stats_row.youth)],
-            ["Adults (26-59)", str(adults)],
+            ["Children (0-15)", str(stats_row.children)],
+            ["Unmarried Youth (16-30)", str(stats_row.youth)],
+            ["Adults", str(adults)],
             ["Senior Citizens (60+)", str(stats_row.seniors)],
         ],
     )
@@ -564,7 +573,7 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
         ReportChart(
             title="Age Distribution",
             kind="bar",
-            labels=["0-12", "13-25", "26-59", "60+"],
+            labels=["0-15", "16-30 Unmarried", "Adults", "60+"],
             values=[float(stats_row.children), float(stats_row.youth), float(adults), float(stats_row.seniors)],
         ),
     ]

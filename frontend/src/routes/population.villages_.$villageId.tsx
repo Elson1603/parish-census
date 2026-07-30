@@ -57,8 +57,8 @@ function VillageDetailPage() {
     const buckets = { children: 0, youth: 0, adults: 0, seniors: 0 };
     for (const member of members) {
       const age = calculateAge(member.dob);
-      if (age <= 12) buckets.children += 1;
-      else if (age <= 25) buckets.youth += 1;
+      if (age <= 15) buckets.children += 1;
+      else if (age <= 30 && member.maritalStatus.toLowerCase() === "unmarried") buckets.youth += 1;
       else if (age < 60) buckets.adults += 1;
       else buckets.seniors += 1;
     }
@@ -150,13 +150,13 @@ function VillageDetailPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Children (0-12): {ageGroups.children}
+              Children (0-15): {ageGroups.children}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Youth (13-25): {ageGroups.youth}
+              Unmarried Youth (16-30): {ageGroups.youth}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Adults (26-59): {ageGroups.adults}
+              Adults: {ageGroups.adults}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
               Seniors (60+): {ageGroups.seniors}

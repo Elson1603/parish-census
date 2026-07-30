@@ -24,8 +24,16 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
             select(
                 func.count(case((Member.gender == "Male", 1))).label("male"),
                 func.count(case((Member.gender == "Female", 1))).label("female"),
-                func.count(case((age <= 12, 1))).label("children"),
-                func.count(case((age.between(13, 25), 1))).label("youth"),
+                func.count(case((age <= 15, 1))).label("children"),
+                func.count(
+                    case(
+                        (
+                            age.between(16, 30)
+                            & (func.lower(Member.marital_status) == "unmarried"),
+                            1,
+                        )
+                    )
+                ).label("youth"),
                 func.count(case((age >= 60, 1))).label("seniors"),
                 func.count(case((Member.baptized.is_(True), 1))).label("baptized"),
                 func.count(case((Member.first_communion.is_(True), 1))).label("first_communion"),
@@ -106,10 +114,10 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
     ]
 
     age_distribution = [
-        schemas.ChartDatum(name="0-12", value=stats_row.children),
-        schemas.ChartDatum(name="13-25", value=stats_row.youth),
+        schemas.ChartDatum(name="0-15", value=stats_row.children),
+        schemas.ChartDatum(name="16-30 Unmarried", value=stats_row.youth),
         schemas.ChartDatum(
-            name="26-59",
+            name="Adults",
             value=total_members - stats_row.children - stats_row.youth - stats_row.seniors,
         ),
         schemas.ChartDatum(name="60+", value=stats_row.seniors),

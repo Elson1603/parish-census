@@ -134,7 +134,7 @@ function DashboardPage() {
           />
           <DashboardStatCard title="Children" value={stats.children} icon={Baby} tone="chart4" />
           <DashboardStatCard
-            title="Youth"
+            title="Unmarried Youth"
             value={stats.youth}
             icon={PersonStanding}
             tone="chart5"
