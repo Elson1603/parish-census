@@ -9,7 +9,7 @@ rendered as images for the PDF export.
 from dataclasses import dataclass, field
 
 from fastapi import HTTPException
-from sqlalchemy import case, func, select
+from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.census import Family, Member, Village
@@ -256,16 +256,24 @@ async def _member_report(db: AsyncSession, title: str, description: str) -> Repo
 
 async def _age_report(db: AsyncSession, title: str, description: str) -> ReportData:
     rows = await _member_rows(db)
-    buckets = {"0-15": 0, "16-30 Unmarried": 0, "Adults": 0, "60+": 0}
+    buckets = {
+        "0-15 Children": 0,
+        "16-30 Unmarried Youth": 0,
+        "16-30 Married Youth": 0,
+        "31-59 Adults": 0,
+        "60+ Senior Citizens": 0,
+    }
 
     def bucket_for(age: int, marital_status: str) -> str:
         if age <= 15:
-            return "0-15"
+            return "0-15 Children"
         if 16 <= age <= 30 and marital_status.lower() == "unmarried":
-            return "16-30 Unmarried"
+            return "16-30 Unmarried Youth"
+        if 16 <= age <= 30 and marital_status.lower() == "married":
+            return "16-30 Married Youth"
         if age < 60:
-            return "Adults"
-        return "60+"
+            return "31-59 Adults"
+        return "60+ Senior Citizens"
 
     detail_rows = []
     for row in rows:
@@ -479,17 +487,36 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
                 func.count(
                     case(
                         (
-                            age.between(16, 30)
-                            & (func.lower(Member.marital_status) == "unmarried"),
+                            and_(
+                                age.between(16, 30),
+                                func.lower(Member.marital_status) == "unmarried",
+                            ),
                             1,
                         )
                     )
                 ).label("youth"),
+                func.count(
+                    case(
+                        (
+                            and_(
+                                age.between(16, 30),
+                                func.lower(Member.marital_status) == "married",
+                            ),
+                            1,
+                        )
+                    )
+                ).label("married_youth"),
                 func.count(case((age >= 60, 1))).label("seniors"),
             )
         )
     ).one()
-    adults = total_members - stats_row.children - stats_row.youth - stats_row.seniors
+    adults = (
+        total_members
+        - stats_row.children
+        - stats_row.youth
+        - stats_row.married_youth
+        - stats_row.seniors
+    )
 
     village_pop_rows = (
         await db.execute(
@@ -529,10 +556,11 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
             ["Total Members", str(total_members)],
             ["Male Members", str(stats_row.male)],
             ["Female Members", str(stats_row.female)],
-            ["Children (0-15)", str(stats_row.children)],
-            ["Unmarried Youth (16-30)", str(stats_row.youth)],
-            ["Adults", str(adults)],
-            ["Senior Citizens (60+)", str(stats_row.seniors)],
+            ["0-15 Children", str(stats_row.children)],
+            ["16-30 Unmarried Youth", str(stats_row.youth)],
+            ["16-30 Married Youth", str(stats_row.married_youth)],
+            ["31-59 Adults", str(adults)],
+            ["60+ Senior Citizens", str(stats_row.seniors)],
         ],
     )
 
@@ -573,8 +601,20 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
         ReportChart(
             title="Age Distribution",
             kind="bar",
-            labels=["0-15", "16-30 Unmarried", "Adults", "60+"],
-            values=[float(stats_row.children), float(stats_row.youth), float(adults), float(stats_row.seniors)],
+            labels=[
+                "0-15 Children",
+                "16-30 Unmarried Youth",
+                "16-30 Married Youth",
+                "31-59 Adults",
+                "60+ Senior Citizens",
+            ],
+            values=[
+                float(stats_row.children),
+                float(stats_row.youth),
+                float(stats_row.married_youth),
+                float(adults),
+                float(stats_row.seniors),
+            ],
         ),
     ]
     if marital_rows:

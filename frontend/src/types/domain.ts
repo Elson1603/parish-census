@@ -55,6 +55,7 @@ export interface DashboardStats {
   femaleMembers: number;
   children: number;
   youth: number;
+  marriedYouth: number;
   seniorCitizens: number;
   baptized: number;
   firstCommunion: number;

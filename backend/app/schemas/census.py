@@ -181,6 +181,7 @@ class DashboardStats(BaseModel):
     female_members: int = Field(serialization_alias="femaleMembers")
     children: int
     youth: int
+    married_youth: int = Field(serialization_alias="marriedYouth")
     senior_citizens: int = Field(serialization_alias="seniorCitizens")
     baptized: int
     first_communion: int = Field(serialization_alias="firstCommunion")

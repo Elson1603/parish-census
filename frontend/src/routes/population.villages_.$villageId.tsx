@@ -54,11 +54,13 @@ function VillageDetailPage() {
   const members = useMemo(() => membersQuery.data ?? [], [membersQuery.data]);
 
   const ageGroups = useMemo(() => {
-    const buckets = { children: 0, youth: 0, adults: 0, seniors: 0 };
+    const buckets = { children: 0, youth: 0, marriedYouth: 0, adults: 0, seniors: 0 };
     for (const member of members) {
       const age = calculateAge(member.dob);
       if (age <= 15) buckets.children += 1;
       else if (age <= 30 && member.maritalStatus.toLowerCase() === "unmarried") buckets.youth += 1;
+      else if (age <= 30 && member.maritalStatus.toLowerCase() === "married")
+        buckets.marriedYouth += 1;
       else if (age < 60) buckets.adults += 1;
       else buckets.seniors += 1;
     }
@@ -148,18 +150,21 @@ function VillageDetailPage() {
           <CardHeader>
             <CardTitle>Age Groups</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 text-sm">
+          <CardContent className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Children (0-15): {ageGroups.children}
+              0-15 Children: {ageGroups.children}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Unmarried Youth (16-30): {ageGroups.youth}
+              16-30 Unmarried Youth: {ageGroups.youth}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Adults: {ageGroups.adults}
+              16-30 Married Youth: {ageGroups.marriedYouth}
             </div>
             <div className="rounded-md border border-border bg-background/70 p-3">
-              Seniors (60+): {ageGroups.seniors}
+              31-59 Adults: {ageGroups.adults}
+            </div>
+            <div className="rounded-md border border-border bg-background/70 p-3">
+              60+ Senior Citizens: {ageGroups.seniors}
             </div>
           </CardContent>
         </Card>

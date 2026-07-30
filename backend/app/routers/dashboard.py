@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import case, func, select
+from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -28,12 +28,25 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
                 func.count(
                     case(
                         (
-                            age.between(16, 30)
-                            & (func.lower(Member.marital_status) == "unmarried"),
+                            and_(
+                                age.between(16, 30),
+                                func.lower(Member.marital_status) == "unmarried",
+                            ),
                             1,
                         )
                     )
                 ).label("youth"),
+                func.count(
+                    case(
+                        (
+                            and_(
+                                age.between(16, 30),
+                                func.lower(Member.marital_status) == "married",
+                            ),
+                            1,
+                        )
+                    )
+                ).label("married_youth"),
                 func.count(case((age >= 60, 1))).label("seniors"),
                 func.count(case((Member.baptized.is_(True), 1))).label("baptized"),
                 func.count(case((Member.first_communion.is_(True), 1))).label("first_communion"),
@@ -55,6 +68,7 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         female_members=stats_row.female,
         children=stats_row.children,
         youth=stats_row.youth,
+        married_youth=stats_row.married_youth,
         senior_citizens=stats_row.seniors,
         baptized=stats_row.baptized,
         first_communion=stats_row.first_communion,
@@ -114,13 +128,18 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
     ]
 
     age_distribution = [
-        schemas.ChartDatum(name="0-15", value=stats_row.children),
-        schemas.ChartDatum(name="16-30 Unmarried", value=stats_row.youth),
+        schemas.ChartDatum(name="0-15 Children", value=stats_row.children),
+        schemas.ChartDatum(name="16-30 Unmarried Youth", value=stats_row.youth),
+        schemas.ChartDatum(name="16-30 Married Youth", value=stats_row.married_youth),
         schemas.ChartDatum(
-            name="Adults",
-            value=total_members - stats_row.children - stats_row.youth - stats_row.seniors,
+            name="31-59 Adults",
+            value=total_members
+            - stats_row.children
+            - stats_row.youth
+            - stats_row.married_youth
+            - stats_row.seniors,
         ),
-        schemas.ChartDatum(name="60+", value=stats_row.seniors),
+        schemas.ChartDatum(name="60+ Senior Citizens", value=stats_row.seniors),
     ]
 
     recent_family_rows = (

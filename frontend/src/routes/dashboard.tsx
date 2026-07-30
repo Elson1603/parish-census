@@ -119,7 +119,7 @@ function DashboardPage() {
 
       <section className="space-y-3">
         <SectionLabel>Demographics</SectionLabel>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-6">
           <DashboardStatCard
             title="Male Members"
             value={stats.maleMembers}
@@ -132,15 +132,26 @@ function DashboardPage() {
             icon={Venus}
             tone="chart3"
           />
-          <DashboardStatCard title="Children" value={stats.children} icon={Baby} tone="chart4" />
           <DashboardStatCard
-            title="Unmarried Youth"
+            title="Children (0-15)"
+            value={stats.children}
+            icon={Baby}
+            tone="chart4"
+          />
+          <DashboardStatCard
+            title="Unmarried Youth (16-30)"
             value={stats.youth}
             icon={PersonStanding}
             tone="chart5"
           />
           <DashboardStatCard
-            title="Senior Citizens"
+            title="Married Youth (16-30)"
+            value={stats.marriedYouth}
+            icon={PersonStanding}
+            tone="accent"
+          />
+          <DashboardStatCard
+            title="Senior Citizens (60+)"
             value={stats.seniorCitizens}
             icon={Heart}
             tone="chart2"
