@@ -224,6 +224,9 @@ function EditMemberPage() {
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
+                        {field.value && !GENDER_OPTIONS.includes(field.value as (typeof GENDER_OPTIONS)[number]) ? (
+                          <SelectItem value={field.value}>{field.value}</SelectItem>
+                        ) : null}
                         <SelectItem value="Male">Male</SelectItem>
                         <SelectItem value="Female">Female</SelectItem>
                       </SelectContent>
@@ -246,6 +249,9 @@ function EditMemberPage() {
                         <SelectValue placeholder="Select marital status" />
                       </SelectTrigger>
                       <SelectContent>
+                        {field.value && !MARITAL_STATUS_OPTIONS.includes(field.value) ? (
+                          <SelectItem value={field.value}>{field.value}</SelectItem>
+                        ) : null}
                         {MARITAL_STATUS_OPTIONS.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
