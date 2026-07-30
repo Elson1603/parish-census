@@ -312,7 +312,7 @@ function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ChartContainer
-              className="h-[260px] w-full"
+              className="h-[260px] w-full justify-start"
               config={{
                 members: { label: "Members", color: "var(--color-chart-5)" },
               }}
