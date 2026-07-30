@@ -10,8 +10,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const EMPTY_OPTION_VALUE = "__empty__";
-
 export function SelectWithOther({
   id,
   label,
@@ -21,8 +19,6 @@ export function SelectWithOther({
   placeholder = "Select an option",
   required = false,
   error,
-  allowEmptyOption = false,
-  emptyOptionLabel = "None",
 }: {
   id: string;
   label: string;
@@ -32,8 +28,6 @@ export function SelectWithOther({
   placeholder?: string;
   required?: boolean;
   error?: string;
-  allowEmptyOption?: boolean;
-  emptyOptionLabel?: string;
 }) {
   const isOther = value.value === OTHER_VALUE;
 
@@ -47,19 +41,13 @@ export function SelectWithOther({
       <Select
         value={value.value}
         onValueChange={(next) =>
-          onChange({
-            value: next === EMPTY_OPTION_VALUE ? "" : next,
-            otherValue: next === OTHER_VALUE ? value.otherValue : "",
-          })
+          onChange({ value: next, otherValue: next === OTHER_VALUE ? value.otherValue : "" })
         }
       >
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {allowEmptyOption ? (
-            <SelectItem value={EMPTY_OPTION_VALUE}>{emptyOptionLabel}</SelectItem>
-          ) : null}
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {option}
