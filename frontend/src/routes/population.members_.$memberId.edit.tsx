@@ -49,14 +49,27 @@ export const Route = createFileRoute("/population/members_/$memberId/edit")({
   component: EditMemberPage,
 });
 
+const GENDER_OPTIONS = ["Male", "Female"] as const;
+
+function cleanText(value: string | null | undefined): string {
+  return (value ?? "").trim();
+}
+
+function matchOption(value: string | null | undefined, options: readonly string[]): string {
+  const cleaned = cleanText(value);
+  if (!cleaned) return "";
+  return options.find((option) => option.toLowerCase() === cleaned.toLowerCase()) ?? cleaned;
+}
+
 // Adapts a plain string field (as stored on Member) to the {value, otherValue}
 // shape SelectWithOther needs, so an existing value that isn't one of the fixed
 // options (e.g. custom text entered via "Other" during intake) still shows up
 // pre-filled in the "Other" text box instead of appearing blank/unselected.
 function toOption(value: string, options: readonly string[]): OptionWithOther {
-  if (!value) return { value: "", otherValue: "" };
-  if (options.includes(value)) return { value, otherValue: "" };
-  return { value: OTHER_VALUE, otherValue: value };
+  const matched = matchOption(value, options);
+  if (!matched) return { value: "", otherValue: "" };
+  if (options.includes(matched)) return { value: matched, otherValue: "" };
+  return { value: OTHER_VALUE, otherValue: matched };
 }
 
 function EditMemberPage() {
@@ -100,25 +113,25 @@ function EditMemberPage() {
     // (it mirrors the census intake wizard's fields only), but are carried
     // through unchanged so saving doesn't wipe out data set elsewhere.
     form.reset({
-      fullName: member.fullName,
-      gender: member.gender,
+      fullName: cleanText(member.fullName),
+      gender: matchOption(member.gender, GENDER_OPTIONS),
       dob: member.dob,
       age: member.age,
       photoUrl: member.photoUrl ?? "",
-      mobile: member.mobile,
-      email: member.email ?? "",
+      mobile: cleanText(member.mobile),
+      email: cleanText(member.email),
       baptized: member.baptized,
       firstCommunion: member.firstCommunion,
       confirmation: member.confirmation,
       churchMarriage: member.churchMarriage,
       villageId: member.villageId,
       familyId: member.familyId,
-      relationshipWithHead: member.relationshipWithHead,
-      maritalStatus: member.maritalStatus,
-      education: member.education,
-      occupation: member.occupation,
+      relationshipWithHead: cleanText(member.relationshipWithHead),
+      maritalStatus: matchOption(member.maritalStatus, MARITAL_STATUS_OPTIONS),
+      education: cleanText(member.education),
+      occupation: cleanText(member.occupation),
       churchGroup: member.churchGroup,
-      remarks: member.remarks ?? "",
+      remarks: cleanText(member.remarks),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member]);
