@@ -107,6 +107,14 @@ function EditMemberPage() {
   });
 
   const member = memberQuery.data;
+  const [educationChoice, setEducationChoice] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
+  const [occupationChoice, setOccupationChoice] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
   React.useEffect(() => {
     if (!member) return;
     // villageId/familyId/email/photoUrl/sacraments aren't shown in this form
@@ -133,6 +141,8 @@ function EditMemberPage() {
       churchGroup: member.churchGroup,
       remarks: cleanText(member.remarks),
     });
+    setEducationChoice(toOption(member.education, EDUCATION_OPTIONS));
+    setOccupationChoice(toOption(member.occupation, JOB_OPTIONS));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member]);
 
@@ -347,8 +357,11 @@ function EditMemberPage() {
                   id="edit-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
-                  value={toOption(field.value ?? "", EDUCATION_OPTIONS)}
-                  onChange={(option) => field.onChange(resolveOptionLabel(option))}
+                  value={educationChoice.value ? educationChoice : toOption(field.value ?? "", EDUCATION_OPTIONS)}
+                  onChange={(option) => {
+                    setEducationChoice(option);
+                    field.onChange(resolveOptionLabel(option));
+                  }}
                   placeholder="Select education"
                 />
               )}
@@ -362,8 +375,11 @@ function EditMemberPage() {
                   id="edit-job"
                   label="Job"
                   options={JOB_OPTIONS}
-                  value={toOption(field.value ?? "", JOB_OPTIONS)}
-                  onChange={(option) => field.onChange(resolveOptionLabel(option))}
+                  value={occupationChoice.value ? occupationChoice : toOption(field.value ?? "", JOB_OPTIONS)}
+                  onChange={(option) => {
+                    setOccupationChoice(option);
+                    field.onChange(resolveOptionLabel(option));
+                  }}
                   placeholder="Select job"
                 />
               )}
