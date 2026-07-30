@@ -539,6 +539,16 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
         )
     ).all()
 
+    education_rows = (
+        await db.execute(
+            select(Member.education, func.count(Member.id))
+            .where(Member.education != "")
+            .group_by(Member.education)
+            .order_by(func.count(Member.id).desc())
+            .limit(8)
+        )
+    ).all()
+
     marital_rows = (
         await db.execute(
             select(Member.marital_status, func.count(Member.id))
@@ -597,6 +607,12 @@ async def _dashboard_statistics_report(db: AsyncSession, title: str, description
             kind="bar",
             labels=[name for name, _ in occupation_rows],
             values=[float(value) for _, value in occupation_rows],
+        ),
+        ReportChart(
+            title="Education Distribution",
+            kind="bar",
+            labels=[name for name, _ in education_rows],
+            values=[float(value) for _, value in education_rows],
         ),
         ReportChart(
             title="Age Distribution",
