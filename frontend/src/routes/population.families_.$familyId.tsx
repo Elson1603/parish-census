@@ -51,15 +51,6 @@ function FamilyDetailPage() {
             <div className="rounded-md border border-border bg-background/70 p-3 text-sm">
               Primary Mobile: {family.contactNumber}
             </div>
-            <div className="rounded-md border border-border bg-background/70 p-3 text-sm">
-              Alternate: {family.alternateNumber || "—"}
-            </div>
-            <div className="rounded-md border border-border bg-background/70 p-3 text-sm md:col-span-2">
-              Address: {family.address}
-            </div>
-            <div className="rounded-md border border-border bg-background/70 p-3 text-sm md:col-span-2">
-              Remarks: {family.remarks || "—"}
-            </div>
           </CardContent>
         </Card>
 
@@ -90,6 +81,13 @@ function FamilyDetailPage() {
               <p className="font-medium text-foreground">{member.fullName}</p>
               <p className="text-muted-foreground">
                 {member.relationshipWithHead} · {member.gender} · {member.age} years
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                Phone: {member.mobile || "—"} · Education: {member.education || "—"} · Job:{" "}
+                {member.occupation || "—"} · Church Group: {member.churchGroup.join(", ") || "—"}
+              </p>
+              <p className="text-muted-foreground">
+                Special Remark: {member.remarks || member.specialNeeds || "—"}
               </p>
             </li>
           ))}
