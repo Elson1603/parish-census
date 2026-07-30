@@ -69,6 +69,7 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
         children=stats_row.children,
         youth=stats_row.youth,
         married_youth=stats_row.married_youth,
+        adults=total_members - stats_row.children - stats_row.youth - stats_row.married_youth - stats_row.seniors,
         senior_citizens=stats_row.seniors,
         baptized=stats_row.baptized,
         first_communion=stats_row.first_communion,

@@ -7,6 +7,7 @@ import {
   Heart,
   House,
   PersonStanding,
+  UsersRound,
   UserRound,
   Users,
   Venus,
@@ -119,7 +120,7 @@ function DashboardPage() {
 
       <section className="space-y-3">
         <SectionLabel>Demographics</SectionLabel>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-7">
           <DashboardStatCard
             title="Male Members"
             value={stats.maleMembers}
@@ -149,6 +150,12 @@ function DashboardPage() {
             value={stats.marriedYouth}
             icon={PersonStanding}
             tone="accent"
+          />
+          <DashboardStatCard
+            title="Adults (31-59)"
+            value={stats.adults}
+            icon={UsersRound}
+            tone="primary"
           />
           <DashboardStatCard
             title="Senior Citizens (60+)"
