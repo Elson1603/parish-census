@@ -56,12 +56,15 @@ function cleanText(value: string | null | undefined): string {
 }
 
 function readText(source: Record<string, unknown>, ...keys: string[]): string {
+  let fallback = "";
   for (const key of keys) {
     const value = source[key];
-    if (typeof value === "string") return cleanText(value);
-    if (value != null) return cleanText(String(value));
+    if (value == null) continue;
+    const cleaned = typeof value === "string" ? cleanText(value) : cleanText(String(value));
+    if (cleaned) return cleaned;
+    fallback = cleaned;
   }
-  return "";
+  return fallback;
 }
 
 function readBoolean(source: Record<string, unknown>, ...keys: string[]): boolean {
@@ -73,15 +76,18 @@ function readBoolean(source: Record<string, unknown>, ...keys: string[]): boolea
 }
 
 function readStringArray(source: Record<string, unknown>, ...keys: string[]): string[] {
+  let fallback: string[] = [];
   for (const key of keys) {
     const value = source[key];
     if (Array.isArray(value)) {
-      return value
+      const cleaned = value
         .map((item) => (typeof item === "string" ? cleanText(item) : cleanText(String(item))))
         .filter(Boolean);
+      if (cleaned.length > 0) return cleaned;
+      fallback = cleaned;
     }
   }
-  return [];
+  return fallback;
 }
 
 function matchOption(value: string | null | undefined, options: readonly string[]): string {
@@ -147,14 +153,14 @@ function EditMemberPage() {
   React.useEffect(() => {
     if (!member) return;
     const memberRecord = member as unknown as Record<string, unknown>;
-    const education = readText(memberRecord, "education");
+    const education = readText(memberRecord, "education", "qualification");
     const occupation = readText(memberRecord, "occupation", "job");
     // villageId/familyId/email/photoUrl/sacraments aren't shown in this form
     // (it mirrors the census intake wizard's fields only), but are carried
     // through unchanged so saving doesn't wipe out data set elsewhere.
     form.reset({
       fullName: readText(memberRecord, "fullName", "full_name"),
-      gender: matchOption(readText(memberRecord, "gender"), GENDER_OPTIONS),
+      gender: matchOption(readText(memberRecord, "gender", "sex"), GENDER_OPTIONS),
       dob: readText(memberRecord, "dob"),
       age: Number(memberRecord.age ?? 0),
       photoUrl: readText(memberRecord, "photoUrl", "photo_url"),
@@ -173,7 +179,7 @@ function EditMemberPage() {
         "relation",
       ),
       maritalStatus: matchOption(
-        readText(memberRecord, "maritalStatus", "marital_status"),
+        readText(memberRecord, "maritalStatus", "marital_status", "marital"),
         MARITAL_STATUS_OPTIONS,
       ),
       education,
