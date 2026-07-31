@@ -1,3 +1,4 @@
+import * as React from "react";
 import { OTHER_VALUE } from "@/constants/census-form-options";
 import type { OptionWithOther } from "@/types/census-intake";
 import { Input } from "@/components/ui/input";
@@ -35,8 +36,28 @@ export function SelectWithOther({
   clearLabel?: string;
   error?: string;
 }) {
-  const isOther = value.value === OTHER_VALUE;
-  const selectValue = value.value || (allowClear ? CLEAR_VALUE : "");
+  // Tracks whether "Other" is the active selection in the UI, independent of
+  // `value.value`. We can't rely on value.value === OTHER_VALUE alone: once the
+  // user picks "Other" but hasn't typed anything yet, resolveOptionLabel()
+  // turns that into "", which round-trips back through toOption() as
+  // { value: "", otherValue: "" } — indistinguishable from "nothing selected".
+  // That collapse would otherwise make the input disappear the instant it appears.
+  const [otherActive, setOtherActive] = React.useState(value.value === OTHER_VALUE);
+
+  React.useEffect(() => {
+    if (value.value === OTHER_VALUE) {
+      setOtherActive(true);
+    } else if (value.value !== "") {
+      // A concrete option came in from outside (e.g. form reset) — leave Other mode.
+      setOtherActive(false);
+    }
+    // If value.value === "", don't touch otherActive: it may just be the
+    // transient "Other selected, not typed yet" state described above.
+  }, [value.value]);
+
+  const selectValue = otherActive
+    ? OTHER_VALUE
+    : value.value || (allowClear ? CLEAR_VALUE : "");
 
   return (
     <div className="space-y-1.5">
@@ -47,12 +68,18 @@ export function SelectWithOther({
 
       <Select
         value={selectValue}
-        onValueChange={(next) =>
-          onChange({
-            value: next === CLEAR_VALUE ? "" : next,
-            otherValue: next === OTHER_VALUE ? value.otherValue : "",
-          })
-        }
+        onValueChange={(next) => {
+          if (next === OTHER_VALUE) {
+            setOtherActive(true);
+            onChange({ value: OTHER_VALUE, otherValue: value.otherValue });
+          } else if (next === CLEAR_VALUE) {
+            setOtherActive(false);
+            onChange({ value: "", otherValue: "" });
+          } else {
+            setOtherActive(false);
+            onChange({ value: next, otherValue: "" });
+          }
+        }}
       >
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
@@ -68,7 +95,7 @@ export function SelectWithOther({
         </SelectContent>
       </Select>
 
-      {isOther ? (
+      {otherActive ? (
         <Input
           placeholder="Please specify"
           value={value.otherValue}
