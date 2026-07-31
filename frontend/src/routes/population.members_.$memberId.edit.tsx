@@ -142,14 +142,6 @@ function EditMemberPage() {
   });
 
   const member = memberQuery.data;
-  const [educationChoice, setEducationChoice] = React.useState<OptionWithOther>({
-    value: "",
-    otherValue: "",
-  });
-  const [occupationChoice, setOccupationChoice] = React.useState<OptionWithOther>({
-    value: "",
-    otherValue: "",
-  });
   React.useEffect(() => {
     if (!member) return;
     const memberRecord = member as unknown as Record<string, unknown>;
@@ -187,8 +179,6 @@ function EditMemberPage() {
       churchGroup: readStringArray(memberRecord, "churchGroup", "church_group"),
       remarks: readText(memberRecord, "remarks", "specialRemark", "special_remark"),
     });
-    setEducationChoice(toOption(education, EDUCATION_OPTIONS));
-    setOccupationChoice(toOption(occupation, JOB_OPTIONS));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member]);
 
@@ -232,6 +222,7 @@ function EditMemberPage() {
 
       <Form {...form}>
         <form
+          key={member?.id ?? memberId}
           onSubmit={form.handleSubmit(onSubmit)}
           className="panel-surface space-y-5 rounded-lg p-4"
         >
@@ -404,13 +395,8 @@ function EditMemberPage() {
                   id="edit-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
-                  value={
-                    educationChoice.value
-                      ? educationChoice
-                      : toOption(field.value ?? "", EDUCATION_OPTIONS)
-                  }
+                  value={toOption(field.value ?? "", EDUCATION_OPTIONS)}
                   onChange={(option) => {
-                    setEducationChoice(option);
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select education"
@@ -427,13 +413,8 @@ function EditMemberPage() {
                   id="edit-job"
                   label="Job"
                   options={JOB_OPTIONS}
-                  value={
-                    occupationChoice.value
-                      ? occupationChoice
-                      : toOption(field.value ?? "", JOB_OPTIONS)
-                  }
+                  value={toOption(field.value ?? "", JOB_OPTIONS)}
                   onChange={(option) => {
-                    setOccupationChoice(option);
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select job"
