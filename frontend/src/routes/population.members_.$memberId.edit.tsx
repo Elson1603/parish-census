@@ -141,6 +141,15 @@ function EditMemberPage() {
     },
   });
 
+  const [educationOption, setEducationOption] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
+  const [jobOption, setJobOption] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
+
   const member = memberQuery.data;
   React.useEffect(() => {
     if (!member) return;
@@ -179,6 +188,8 @@ function EditMemberPage() {
       churchGroup: readStringArray(memberRecord, "churchGroup", "church_group"),
       remarks: readText(memberRecord, "remarks", "specialRemark", "special_remark"),
     });
+    setEducationOption(toOption(education, EDUCATION_OPTIONS));
+    setJobOption(toOption(occupation, JOB_OPTIONS));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member]);
 
@@ -395,8 +406,9 @@ function EditMemberPage() {
                   id="edit-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
-                  value={toOption(field.value ?? "", EDUCATION_OPTIONS)}
+                  value={educationOption}
                   onChange={(option) => {
+                    setEducationOption(option);
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select education"
@@ -413,8 +425,9 @@ function EditMemberPage() {
                   id="edit-job"
                   label="Job"
                   options={JOB_OPTIONS}
-                  value={toOption(field.value ?? "", JOB_OPTIONS)}
+                  value={jobOption}
                   onChange={(option) => {
+                    setJobOption(option);
                     field.onChange(resolveOptionLabel(option));
                   }}
                   placeholder="Select job"

@@ -87,6 +87,15 @@ function AddMemberPage() {
     },
   });
 
+  const [educationOption, setEducationOption] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
+  const [jobOption, setJobOption] = React.useState<OptionWithOther>({
+    value: "",
+    otherValue: "",
+  });
+
   const selectedVillageId = form.watch("villageId");
   const familiesQuery = useQuery({
     queryKey: ["families", { village: selectedVillageId || "all" }],
@@ -113,6 +122,8 @@ function AddMemberPage() {
     }
     toast.success("Member saved successfully");
     form.reset();
+    setEducationOption({ value: "", otherValue: "" });
+    setJobOption({ value: "", otherValue: "" });
   };
 
   return (
@@ -354,8 +365,11 @@ function AddMemberPage() {
                   id="add-education"
                   label="Education"
                   options={EDUCATION_OPTIONS}
-                  value={toOption(field.value ?? "", EDUCATION_OPTIONS)}
-                  onChange={(option) => field.onChange(resolveOptionLabel(option))}
+                  value={educationOption}
+                  onChange={(option) => {
+                    setEducationOption(option);
+                    field.onChange(resolveOptionLabel(option));
+                  }}
                   placeholder="Select education"
                 />
               )}
@@ -369,8 +383,11 @@ function AddMemberPage() {
                   id="add-job"
                   label="Job"
                   options={JOB_OPTIONS}
-                  value={toOption(field.value ?? "", JOB_OPTIONS)}
-                  onChange={(option) => field.onChange(resolveOptionLabel(option))}
+                  value={jobOption}
+                  onChange={(option) => {
+                    setJobOption(option);
+                    field.onChange(resolveOptionLabel(option));
+                  }}
                   placeholder="Select job"
                 />
               )}
@@ -411,7 +428,15 @@ function AddMemberPage() {
           />
 
           <div className="flex flex-wrap justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => form.reset()}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                form.reset();
+                setEducationOption({ value: "", otherValue: "" });
+                setJobOption({ value: "", otherValue: "" });
+              }}
+            >
               Reset
             </Button>
             <Button type="submit">Save Member</Button>
