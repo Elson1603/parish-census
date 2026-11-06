@@ -127,6 +127,14 @@ export async function updateMember(memberId: string, payload: unknown) {
   return response.data;
 }
 
+export async function deleteMember(memberId: string) {
+  await apiClient.delete(`/members/${memberId}`);
+}
+
+export async function deleteFamily(familyId: string) {
+  await apiClient.delete(`/families/${familyId}`);
+}
+
 export async function submitFamilyCensus(payload: unknown) {
   const response = await apiClient.post<{ ok: boolean; message: string }>(
     "/census/intake",

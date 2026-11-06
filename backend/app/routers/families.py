@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -68,3 +68,13 @@ async def create_family(payload: schemas.FamilyCreate, db: AsyncSession = Depend
 
     row = (await db.execute(family_select().where(Family.id == family.id))).first()
     return schemas.Family.model_validate(dict(row._mapping))
+
+
+@router.delete("/{family_id}", status_code=204)
+async def delete_family(family_id: str, db: AsyncSession = Depends(get_db)):
+    family = await db.get(Family, family_id)
+    if not family:
+        raise HTTPException(status_code=404, detail="Family not found")
+    await db.delete(family)
+    await db.commit()
+    return Response(status_code=204)

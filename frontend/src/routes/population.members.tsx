@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,9 +24,10 @@ import {
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
-import { getMembers, getVillages } from "@/services/census.service";
+import { deleteMember, getMembers, getVillages } from "@/services/census.service";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { cn } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export const Route = createFileRoute("/population/members")({
   component: MembersPage,
@@ -34,7 +36,20 @@ export const Route = createFileRoute("/population/members")({
 function MembersPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
+  const queryClient = useQueryClient();
   const debouncedSearch = useDebouncedValue(search, 300);
+  const deleteMutation = useMutation({
+    mutationFn: deleteMember,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["members"] }),
+        queryClient.invalidateQueries({ queryKey: ["families"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+      ]);
+      toast.success("Member deleted");
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Unable to delete member.")),
+  });
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
   const membersQuery = useQuery({
@@ -126,6 +141,21 @@ function MembersPage() {
                       >
                         Edit
                       </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      disabled={deleteMutation.isPending}
+                      aria-label={`Delete ${member.fullName}`}
+                      onClick={() => {
+                        if (window.confirm(`Delete ${member.fullName}? This cannot be undone.`)) {
+                          deleteMutation.mutate(member.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>

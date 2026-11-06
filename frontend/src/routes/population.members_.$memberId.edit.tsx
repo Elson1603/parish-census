@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { CalendarIcon } from "lucide-react";
 import { useUnsavedChangesWarning } from "@/hooks/use-unsaved-changes-warning";
-import { getMemberById, updateMember } from "@/services/census.service";
+import { getFamilyById, getMemberById, updateMember } from "@/services/census.service";
 import { getApiErrorMessage } from "@/lib/api-error";
 import {
   CHURCH_GROUP_OPTIONS,
@@ -113,7 +113,32 @@ function EditMemberPage() {
 
   const memberQuery = useQuery({
     queryKey: ["member", memberId],
-    queryFn: () => getMemberById(memberId),
+    staleTime: 0,
+    refetchOnMount: "always",
+    queryFn: async () => {
+      const member = await getMemberById(memberId);
+      if (!member.familyId) return member;
+
+      try {
+        const family = await getFamilyById(member.familyId);
+        const familyMember = family.familyMembers.find((item) => item.id === memberId);
+        if (!familyMember) return member;
+
+        // The family detail view is another API path that returns the persisted
+        // member fields. Use its non-empty values if the individual response
+        // omitted any of the census selectors.
+        return {
+          ...member,
+          gender: member.gender || familyMember.gender,
+          maritalStatus: member.maritalStatus || familyMember.maritalStatus,
+          education: member.education || familyMember.education,
+          occupation: member.occupation || familyMember.occupation,
+        };
+      } catch {
+        // Keep edit available if the secondary family fetch is temporarily down.
+        return member;
+      }
+    },
   });
 
   const form = useForm<MemberFormValues>({

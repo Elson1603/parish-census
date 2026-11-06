@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -98,6 +98,16 @@ async def create_member(payload: schemas.MemberCreate, db: AsyncSession = Depend
 
     row = (await db.execute(member_select().where(Member.id == member.id))).first()
     return schemas.Member.model_validate(dict(row._mapping))
+
+
+@router.delete("/{member_id}", status_code=204)
+async def delete_member(member_id: str, db: AsyncSession = Depends(get_db)):
+    member = await db.get(Member, member_id)
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    await db.delete(member)
+    await db.commit()
+    return Response(status_code=204)
 
 
 @router.put("/{member_id}", response_model=schemas.Member)

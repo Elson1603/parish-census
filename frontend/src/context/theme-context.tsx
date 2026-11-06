@@ -21,10 +21,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const nextTheme = prefersDark ? "dark" : "light";
-    setThemeState(nextTheme);
-    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    setThemeState("light");
+    document.documentElement.classList.remove("dark");
   }, []);
 
   const setTheme = (nextTheme: ThemeMode) => {

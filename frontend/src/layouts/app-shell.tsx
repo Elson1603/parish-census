@@ -71,7 +71,7 @@ function AdminShell({ children }: { children: ReactNode }) {
 function UserShell({ children, onLogout }: { children: ReactNode; onLogout: () => void }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3 sm:px-6 lg:px-8">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">

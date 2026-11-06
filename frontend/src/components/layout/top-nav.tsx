@@ -85,11 +85,11 @@ export function TopNav() {
   };
 
   return (
-    <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 border-b border-border bg-card/85 px-4 py-3 shadow-sm backdrop-blur-md sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-10 grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 border-b border-border bg-card px-4 py-3 sm:px-6 lg:px-8">
       <SidebarTrigger className="shrink-0" />
 
       <div className="relative w-full max-w-xl">
-        <div className="flex h-11 items-center gap-2 rounded-full border border-input bg-background/70 px-4 shadow-sm transition-colors focus-within:border-primary/60 focus-within:ring-1 focus-within:ring-ring">
+        <div className="flex h-10 items-center gap-2 rounded-lg border border-input bg-background px-3.5 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             ref={searchInputRef}

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/page-header";
 import { LoadingSpinner } from "@/components/common/loading-spinner";
 import { ErrorState } from "@/components/common/error-state";
@@ -23,9 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getFamilies, getVillages } from "@/services/census.service";
+import { deleteFamily, getFamilies, getVillages } from "@/services/census.service";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { cn } from "@/lib/utils";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export const Route = createFileRoute("/population/families")({
   component: FamiliesPage,
@@ -34,7 +36,22 @@ export const Route = createFileRoute("/population/families")({
 function FamiliesPage() {
   const [search, setSearch] = useState("");
   const [village, setVillage] = useState("all");
+  const queryClient = useQueryClient();
   const debouncedSearch = useDebouncedValue(search, 300);
+  const deleteMutation = useMutation({
+    mutationFn: deleteFamily,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["families"] }),
+        queryClient.invalidateQueries({ queryKey: ["family"] }),
+        queryClient.invalidateQueries({ queryKey: ["members"] }),
+        queryClient.invalidateQueries({ queryKey: ["villages"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+      ]);
+      toast.success("Family and its members deleted");
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, "Unable to delete family.")),
+  });
 
   const villagesQuery = useQuery({ queryKey: ["villages"], queryFn: getVillages });
   const familiesQuery = useQuery({
@@ -117,6 +134,25 @@ function FamiliesPage() {
                       <Link to="/population/families/$familyId" params={{ familyId: family.id }}>
                         View
                       </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      disabled={deleteMutation.isPending}
+                      aria-label={`Delete family headed by ${family.headOfFamily}`}
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Delete the family headed by ${family.headOfFamily}? This will permanently delete the family and every member in it. This cannot be undone.`,
+                          )
+                        ) {
+                          deleteMutation.mutate(family.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      Delete
                     </Button>
                   </TableCell>
                 </TableRow>
