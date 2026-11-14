@@ -231,15 +231,28 @@ function EditMemberPage() {
     );
 
   const onSubmit = async (values: MemberFormValues) => {
+    const originalMember = (member ?? {}) as unknown as Record<string, unknown>;
+    const payload = {
+      ...values,
+      // SelectWithOther maintains its option state separately from React Hook
+      // Form. Preserve the fetched value unless that selector was actually
+      // changed, so editing unrelated fields cannot clear saved job/education.
+      education: form.formState.dirtyFields.education
+        ? values.education
+        : readText(originalMember, "education", "qualification"),
+      occupation: form.formState.dirtyFields.occupation
+        ? values.occupation
+        : readText(originalMember, "occupation", "job"),
+    };
     try {
-      await updateMember(memberId, values);
+      await updateMember(memberId, payload);
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Unable to update member. Please try again."));
       return;
     }
     // Re-baseline the form to what we just saved so the unsaved-changes blocker
     // doesn't intercept this intentional navigation right after a successful save.
-    form.reset(values);
+    form.reset(payload);
     toast.success("Member updated successfully");
     navigate({ to: "/population/members" });
   };
