@@ -138,12 +138,12 @@ async def update_member(member_id: str, payload: schemas.MemberCreate, db: Async
     member.marital_status = payload.marital_status
     member.remarks = payload.remarks
 
-    # occupation/education can now be explicitly cleared from the edit form, so a
-    # non-None payload value should always be written back. blood_group/special_needs
-    # still preserve omission when the admin UI does not send them.
-    if payload.occupation is not None:
+    # The edit form can submit empty strings for untouched custom dropdowns.
+    # Treat blank job/education values as omitted so an unrelated edit cannot
+    # erase the values already stored for this member.
+    if payload.occupation is not None and payload.occupation.strip():
         member.occupation = payload.occupation
-    if payload.education is not None:
+    if payload.education is not None and payload.education.strip():
         member.education = payload.education
     if payload.blood_group is not None:
         member.blood_group = payload.blood_group
