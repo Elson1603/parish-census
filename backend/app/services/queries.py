@@ -8,13 +8,28 @@ def age_expr(dob_column):
     return cast(func.date_part("year", func.age(func.current_date(), dob_column)), Integer)
 
 
+def family_head_name_expr():
+    """Use the current Head member name, falling back to the family's saved label."""
+    current_head_name = (
+        select(Member.full_name)
+        .where(
+            Member.family_id == Family.id,
+            func.lower(Member.relationship_with_head) == "head",
+        )
+        .order_by(Member.created_at, Member.id)
+        .limit(1)
+        .scalar_subquery()
+    )
+    return func.coalesce(current_head_name, Family.head_of_family)
+
+
 def family_select() -> Select:
-    """Family joined with its village name, columns ordered for schemas.Family construction."""
+    """Family joined with its village and current head member name."""
     return select(
         Family.id,
         Family.village_id,
         Village.name.label("village_name"),
-        Family.head_of_family,
+        family_head_name_expr().label("head_of_family"),
         Family.contact_number,
         Family.alternate_number,
         Family.email,

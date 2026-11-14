@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.census import Family, Village
 from app.schemas import census as schemas
-from app.services.queries import family_select, member_select
+from app.services.queries import family_head_name_expr, family_select, member_select
 
 router = APIRouter(prefix="/families", tags=["families"])
 
@@ -22,7 +22,7 @@ async def list_families(
         pattern = f"%{search.strip().lower()}%"
         stmt = stmt.where(
             or_(
-                func.lower(Family.head_of_family).like(pattern),
+                func.lower(family_head_name_expr()).like(pattern),
                 func.lower(Village.name).like(pattern),
             )
         )

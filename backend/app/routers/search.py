@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.census import Family, Member, Village
 from app.schemas import census as schemas
+from app.services.queries import family_head_name_expr
 
 router = APIRouter(prefix="/search", tags=["search"])
 
@@ -39,11 +40,11 @@ async def global_search(q: str = Query(default=""), db: AsyncSession = Depends(g
 
     family_rows = (
         await db.execute(
-            select(Family.id, Family.head_of_family, Village.name)
+            select(Family.id, family_head_name_expr().label("head_of_family"), Village.name)
             .join(Village, Village.id == Family.village_id)
             .where(
                 or_(
-                    func.lower(Family.head_of_family).like(pattern),
+                    func.lower(family_head_name_expr()).like(pattern),
                     func.lower(Village.name).like(pattern),
                 )
             )
